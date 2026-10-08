@@ -100,3 +100,13 @@ FlexHUD = "Regale statt festgenagelter Bilder": Alle Anzeigen (Timer, Steps, Uhr
 sind frei verschiebbare Kärtchen mit eigenem Style, plus eingebauter Laden für
 fertige Kärtchen-Sets – und es warnt, wenn ein Kärtchen mit einer anderen Mod
 doppelt hängt.
+
+## 7. Editor-Rework (09.10.2026, nach In-Game-Screenshot)
+
+- Problem: fixe Pixel-Positionen liefen auf schmalen Fenstern rechts aus dem Bild.
+- Fix: `WidgetEditorScreen` komplett responsiv (Listen-/Panel-Breiten aus `width`,
+  Buttons lassen Plätze aus statt zu überlappen, Paging bei vielen Widgets),
+  dazu unten eine **Live-Vorschau mit echtem Stil + echter Animation**
+  (GradientUtil + `Util.getMillis()`), Klick-wählt-nächstes-Widget + Drag.
+- Layout-Regel für neue Screens: NIE fixe X-Positionen rechts von `width/2`
+  annehmen – immer aus `this.width/height` rechnen (vgl. Screenshot-Bug).
