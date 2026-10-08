@@ -146,3 +146,21 @@ doppelt hängt.
   Typ-Grid (scrollbar) – kein Picker-Dialog (User-Wunsch: alles direkt sichtbar).
 - **Drag-Bugfix**: `setDragging(true/false)` im Editor war Pflicht – ohne
   liefert Vanilla keine `mouseDragged`-Events (Dispatch prüft `isDragging`).
+
+## 10. Skin-Totem-Pack (Idee, 09.10.2026, User-Wunsch)
+
+- **Konzept**: Download-Pack, das aus dem Skin des Users **autonom** ein
+  Totem-Texturepack erstellt und reinlädt. User klickt in der Pack-Config nur
+  auf **„Recreate SkinTotem"**, der Rest läuft von allein (neu generieren bei
+  Skin-Wechsel per erneutem Klick).
+- **Technik-Skizze**: Skin-PNG holen (SkinManager/GameProfile-Textures, 64x64,
+  Fallback Steve/Alex + Legacy-64x32 beachten) → auf Totem-Template mappen
+  (Stile „fullbody"/„normal" wie in den bestehenden skinmc-Packs des Users) →
+  Resourcepack nach `resourcepacks/flexhud-skintotem/` schreiben (`pack.mcmeta`
+  mit passendem `pack_format`, Totem-Textur/-Model ersetzen) → Pack per
+  ResourcePack-Liste + Reload aktivieren (26.3-API noch verifizieren!).
+- **Anbindung**: als `.flexconfig`-Button (neuer Action-Typ, z. B.
+  `recreateTotem`) im Overview-Menü/Widget-Menü des Packs.
+- **Offen**: Skin-Fetch bei Offline-Spielern, Server-Resourcepacks (Konflikt?),
+  Reload-Ruckler, `pack_format`-Pflege pro MC-Version, Custom-Model-Data vs.
+  Textur-Replace entscheiden.
