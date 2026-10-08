@@ -1,0 +1,94 @@
+name: "🛒 Marketplace-Pack einreichen"
+description: "Reiche ein Widget-Pack für den FlexHUD-Marketplace ein. Der Maintainer prüft es und trägt den Download-Link in marketplace.json ein."
+title: "[Marketplace] <Pack-Name>"
+labels: ["marketplace-submission"]
+body:
+  - type: input
+    id: pack-name
+    attributes:
+      label: "Pack-Name"
+      description: "Anzeigename, z.B. StepCount-Bridge-Pack"
+    validations:
+      required: true
+  - type: input
+    id: pack-id
+    attributes:
+      label: "Pack-ID"
+      description: "Kleinbuchstaben, z.B. mein-pack (nur a-z 0-9 . _ -)"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: "Beschreibung"
+      description: "Was tut das Pack? 1-2 Sätze."
+    validations:
+      required: true
+  - type: input
+    id: author
+    attributes:
+      label: "Autor"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: "Version"
+      description: "z.B. 1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: download-url
+    attributes:
+      label: "Download-Link (.zip)"
+      description: "Direkter Link zur Pack-Zip, z.B. GitHub-Release-Asset. Die Zip MUSS pack.json im Root enthalten."
+    validations:
+      required: true
+  - type: input
+    id: mod-id
+    attributes:
+      label: "Mod-ID (PFLICHT für Konflikterkennung)"
+      description: "Fabric-Mod-ID aus fabric.mod.json, z.B. stepcount"
+    validations:
+      required: true
+  - type: input
+    id: jar-hints
+    attributes:
+      label: "JAR-Hinweise (PFLICHT, Komma-getrennt)"
+      description: "Dateinamen-Teile zur .jar-Erkennung in mods/, z.B. stepcount-mod,stepcount"
+    validations:
+      required: true
+  - type: dropdown
+    id: pack-type
+    attributes:
+      label: "Pack-Typ"
+      options:
+        - widget-pack
+        - bridge
+        - theme
+    validations:
+      required: true
+  - type: input
+    id: icon-url
+    attributes:
+      label: "Icon-URL (optional)"
+    validations:
+      required: false
+  - type: textarea
+    id: install-note
+    attributes:
+      label: "Installations-Hinweis (optional)"
+      description: "z.B. welche Mod als .jar nötig ist"
+    validations:
+      required: false
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: "Checkliste"
+      options:
+        - label: "Die Zip enthält pack.json im Root (mit widgets[])"
+          required: true
+        - label: "modId + jarHints sind korrekt (Konflikterkennung getestet oder plausibel)"
+          required: true
+        - label: "Der Download-Link ist öffentlich abrufbar (kein Login nötig)"
+          required: true

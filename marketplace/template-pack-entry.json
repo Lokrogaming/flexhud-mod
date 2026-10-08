@@ -1,0 +1,14 @@
+{
+  "_comment": "VORLAGE für neue Marketplace-Einträge. Kopieren, ausfüllen, per scripts/Add-MarketplaceEntry.ps1 eintragen (oder manuell in marketplace.json unter packs[] einfügen). PFLICHT: id, name, downloadUrl, modId, jarHints.",
+  "id": "mein-pack",
+  "name": "Mein Pack",
+  "description": "Was das Pack tut, in 1-2 Sätzen.",
+  "author": "Dein Name",
+  "version": "1.0.0",
+  "iconUrl": "",
+  "downloadUrl": "https://github.com/DEINUSER/DEINREPO/releases/download/v1.0.0/mein-pack-1.0.0.zip",
+  "modId": "meine-mod",
+  "jarHints": ["meine-mod"],
+  "packType": "widget-pack",
+  "installNote": "Hinweis für Spieler, z.B. welche Mod als .jar nötig ist."
+}

@@ -112,6 +112,21 @@ Die Mod läuft **komplett client-seitig** – auch auf Servern ohne Server-Mod.
 > zur `.jar`-Erkennung (z. B. `["stepcount-mod", "stepcount"]`). Ohne diese Felder
 > kann FlexHUD **nicht** vor doppelten Modulen warnen!
 
+## Marketplace-Einträge verwalten (für Maintainer)
+
+Jeder Download-Link ist ein **einzelner Eintrag** in `marketplace/marketplace.json`
+(`packs[]`). Wenn dir jemand ein Pack einreicht, trägst du es so ein:
+
+1. **Einreichung prüfen**: Issue-Vorlage „Marketplace-Pack einreichen“
+   (`.github/ISSUE_TEMPLATE/marketplace-submission.yml`) – enthält alle Felder
+   + Checkliste (pack.json im Root, modId/jarHints, öffentlicher Link).
+2. **Eintragen** (validiert Pflichtfelder, IDs, URL und Zip automatisch):
+   `powershell -File scripts/Add-MarketplaceEntry.ps1 -Id "mein-pack" -Name "Mein Pack" -Description "..." -Author "Du" -Version "1.0.0" -DownloadUrl "https://..." -ModId "meine-mod" -JarHints "meine-mod,meine_mod" -CheckUrl -VerifyZip`
+   Vorlage für die Felder: `marketplace/template-pack-entry.json`.
+3. **Gesamt-Check**: `powershell -File scripts/Test-MarketplaceJson.ps1`
+   (optional `-CheckUrls -VerifyZips`), dann committen + pushen – ab dann
+   sehen alle Spieler den Eintrag im In-Game-Marketplace.
+
 ## Dateien & Ordner
 
 - `config/flexhud.json` – Widgets, Styles, Marketplace-URL

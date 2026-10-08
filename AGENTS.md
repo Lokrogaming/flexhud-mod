@@ -70,6 +70,13 @@ scripts/  Build-ExamplePack.ps1, Release-StepCountPack.ps1, Init-Repos.ps1
 ```
 Zip-Layout: `pack.json` (mit `widgets[]`) im Zip-Root + optionale README/Assets.
 
+## Marketplace-Einträge (Maintainer-Workflow)
+- Einreichungen kommen per GitHub-Issue (`.github/ISSUE_TEMPLATE/marketplace-submission.yml`).
+- Eintragen NUR via `scripts/Add-MarketplaceEntry.ps1` (validiert Pflichtfelder,
+  ID-Format, Duplikate; `-CheckUrl -VerifyZip` prüfen Link + pack.json im Root).
+- Danach `scripts/Test-MarketplaceJson.ps1` (ggf. `-CheckUrls -VerifyZips`).
+- Feld-Vorlage: `marketplace/template-pack-entry.json`.
+
 ## Dokumentation
 - `README.md` = User-Doku + CurseForge/Modrinth-Description (zusammen halten!).
 - `THOUGHTS.md` = Entscheidungen/Ideen/Backlog (bei jeder größeren Änderung ergänzen).
