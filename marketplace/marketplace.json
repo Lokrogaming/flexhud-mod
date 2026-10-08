@@ -1,4 +1,4 @@
-﻿{
+{
     "_comment":  "FlexHUD-Marketplace. Diese Datei wird von der Mod per URL geladen (siehe Config marketplaceUrl). PFLICHT-Felder pro Pack: id, name, downloadUrl, modId, jarHints.",
     "packs":  [
                   {

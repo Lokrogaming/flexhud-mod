@@ -35,8 +35,8 @@ public final class FlexhudConfig {
 	}
 
 	private static String defaultMarketplaceUrl() {
-		// Aus gradle.properties übernommen; Fallback auf Repo-Pfad.
-		return "https://raw.githubusercontent.com/Lokrogaming/flexhud-mod/main/marketplace/marketplace.json";
+		// Aus gradle.properties übernommen; Fallback auf Repo-Pfad (Branch master!).
+		return "https://raw.githubusercontent.com/Lokrogaming/flexhud-mod/master/marketplace/marketplace.json";
 	}
 
 	private static List<WidgetConfig> defaultWidgets() {
@@ -58,11 +58,16 @@ public final class FlexhudConfig {
 					if (loaded.widgets == null || loaded.widgets.isEmpty()) {
 						loaded.widgets = defaultWidgets();
 					}
-					if (loaded.marketplaceUrl == null || loaded.marketplaceUrl.isBlank()) {
+					if (loaded.marketplaceUrl == null || loaded.marketplaceUrl.isBlank()
+						|| loaded.marketplaceUrl.contains("/main/marketplace.json")
+						|| loaded.marketplaceUrl.contains("githubusercontent.com/lokro/")) {
+						// Selbstheilung: alte kaputte URLs (falscher User/Branch) ersetzen.
 						loaded.marketplaceUrl = defaultMarketplaceUrl();
+						FlexhudMod.LOGGER.info("[FlexHUD] Marketplace-URL auf Standard zurückgesetzt.");
 					}
 					INSTANCE = loaded;
 					FlexhudMod.LOGGER.info("[FlexHUD] Config geladen: {} Widgets.", INSTANCE.widgets.size());
+					save();
 					return;
 				}
 			} catch (Exception e) {

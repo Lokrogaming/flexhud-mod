@@ -110,7 +110,11 @@ public final class MarketplaceCache {
 	/** Akzeptiert Array-Form oder Objekt-Form {packs:[...]}. */
 	static List<MarketplaceEntry> parseEntries(String json) {
 		List<MarketplaceEntry> out = new ArrayList<>();
-		JsonElement root = JsonParser.parseString(json);
+		String clean = json == null ? "" : json.strip();
+		if (!clean.isEmpty() && clean.charAt(0) == '\uFEFF') {
+			clean = clean.substring(1); // BOM entfernen (manche Editoren/Skripte schreiben eins)
+		}
+		JsonElement root = JsonParser.parseString(clean);
 		JsonArray arr;
 		if (root.isJsonArray()) {
 			arr = root.getAsJsonArray();
