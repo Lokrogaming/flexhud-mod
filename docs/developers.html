@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlexHUD – Entwickler-Docs (Packs, .flexconfig, Build)</title>
+<meta name="description" content="FlexHUD Developer Docs: eigene Marketplace-Packs bauen, pack.json, .flexconfig mit Custom-Buttons, Marketplace-Einträge, Mod bauen und integrieren.">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        pixel: ['"Press Start 2P"', 'monospace'],
+        body: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      colors: { void: '#0b0b14', panel: '#14141f', neon: '#22d3ee', grape: '#a855f7' }
+    }
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  body { background: #0b0b14; }
+  .grad-text { background: linear-gradient(90deg,#22d3ee,#60a5fa,#a855f7,#f472b6,#fb923c,#fde047); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .grad-border { border: 1px solid transparent; background: linear-gradient(#14141f,#14141f) padding-box, linear-gradient(135deg,#22d3ee,#a855f7) border-box; }
+  .grid-bg { background-image: linear-gradient(rgba(34,211,238,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,.06) 1px, transparent 1px); background-size: 32px 32px; }
+  code { font-family: ui-monospace, monospace; }
+  pre { white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: 12px; line-height: 1.6; }
+  table { font-size: 13px; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,.08); vertical-align: top; }
+  section { scroll-margin-top: 20px; }
+</style>
+</head>
+<body class="text-slate-200 font-body antialiased">
+<div class="grid-bg min-h-screen">
+
+<nav class="max-w-6xl mx-auto flex items-center justify-between px-4 py-5">
+  <a href="index.html" class="flex items-center gap-3">
+    <img src="assets/logo.png" alt="FlexHUD Logo" class="w-10 h-10 rounded-lg">
+    <span class="font-pixel text-sm md:text-base grad-text">FlexHUD</span>
+  </a>
+  <div class="flex items-center gap-2 md:gap-4 text-sm">
+    <a href="index.html" class="px-3 py-2 rounded-lg hover:bg-white/5">Startseite</a>
+    <a href="#pack" class="px-3 py-2 rounded-lg hover:bg-white/5">Pack bauen</a>
+    <a href="#flexconfig" class="px-3 py-2 rounded-lg hover:bg-white/5">.flexconfig</a>
+    <a href="#marketplace" class="px-3 py-2 rounded-lg hover:bg-white/5">Marketplace</a>
+    <a href="#build" class="px-3 py-2 rounded-lg hover:bg-white/5">Mod bauen</a>
+    <a href="https://github.com/Lokrogaming/flexhud-mod" class="px-3 py-2 rounded-lg hover:bg-white/5">GitHub</a>
+  </div>
+</nav>
+
+<header class="max-w-6xl mx-auto px-4 pt-10 pb-10">
+  <p class="font-pixel text-[10px] md:text-xs text-cyan-300 mb-4">DEVELOPER DOCS</p>
+  <h1 class="font-pixel text-2xl md:text-3xl leading-relaxed mb-4">Eigene Packs <span class="grad-text">bauen</span></h1>
+  <p class="text-slate-300 max-w-3xl">Ein FlexHUD-Pack ist eine <strong class="text-white">.zip</strong> mit Widgets, Stil und optionaler
+  <code class="text-cyan-300">.flexconfig</code> für Meta + Custom-Buttons. Hier steht alles: Pack-Aufbau, Referenzen,
+  Marketplace-Eintrag, Mod bauen und Integration (Bridge, i18n, Konflikte, Updates).</p>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 pb-16 space-y-10">
+
+<section id="pack" class="rounded-2xl bg-panel border border-white/10 p-6">
+  <h2 class="font-pixel text-sm md:text-base mb-4">1. Pack-<span class="grad-text">Aufbau</span></h2>
+  <pre class="rounded-xl bg-black/40 border border-white/10 p-4 text-slate-300">mein-pack/
+  pack.json            # PFLICHT im Zip-Root (widgets[] werden importiert)
+  mein-pack.flexconfig # optional: Meta + Custom-Buttons (Name frei, *.flexconfig)
+  README.md            # optional
+  assets/...           # optional (Icons: reserviert, Auswertung später)</pre>
+  <p class="text-sm text-slate-400 mt-3">Zip so packen, dass <code class="text-cyan-300">pack.json</code> im <strong class="text-white">Root</strong> liegt –
+  sonst importiert FlexHUD nichts. Als <strong class="text-white">GitHub-Release-Asset</strong> hochladen (stabiler Direkt-Link).</p>
+  <h3 class="font-bold text-white mt-5 mb-2 text-sm">pack.json (Beispiel)</h3>
+  <pre class="rounded-xl bg-black/40 border border-white/10 p-4 text-slate-300">{
+  "packId": "mein-pack",
+  "packName": "Mein Pack",
+  "packVersion": "1.0.0",
+  "requiresModId": "meine-mod",
+  "requiresJarHints": ["meine-mod"],
+  "widgets": [
+    {
+      "type": "TEXT", "template": "Hallo Welt",
+      "x": 0.5, "y": 0.2, "enabled": true,
+      "style": {
+        "gradient": ["00FFCC", "AA55FF"], "animation": "SCROLL_L",
+        "cycleMs": 3500, "bold": true, "italic": false,
+        "shadow": true, "background": false, "backgroundOpacity": 120,
+        "scale": 1.0, "hideText": false, "staticColor": "FFFFFF"
+      }
+    }
+  ]
+}</pre>
+  <p class="text-sm text-slate-400 mt-3">Widget-Typen: <code class="text-cyan-300">TIMER, STEPCOUNT, CLOCK, TEXT, FPS</code>.
+  Timer-Vorlagen verstehen <code class="text-cyan-300">{value}</code> plus <code class="text-cyan-300">{d} {h} {m} {s} {ms}</code>.
+  IDs werden beim Import neu vergeben, Positionen/Styles bleiben.</p>
+</section>
+
+<section id="flexconfig" class="rounded-2xl bg-panel border border-white/10 p-6">
+  <h2 class="font-pixel text-sm md:text-base mb-4">2. <span class="grad-text">.flexconfig</span>-Referenz</h2>
+  <p class="text-sm text-slate-400 mb-4">Optionale Datei im Pack-Root. <strong class="text-white">Meta</strong> erscheint im Marketplace,
+  <strong class="text-white">configMenu</strong> (muss explizit deklariert sein!) erscheint im Overview-Menü und wirkt auf
+  <strong class="text-white">alle</strong> Pack-Widgets, <strong class="text-white">widgetButtons</strong> erscheinen als ★-Buttons im
+  Stil-Menü und wirken aufs <strong class="text-white">gewählte</strong> Widget.</p>
+  <h3 class="font-bold text-white mb-2 text-sm">Meta-Felder</h3>
+  <div class="overflow-x-auto rounded-xl border border-white/10 mb-5">
+  <table class="w-full text-slate-300">
+    <tr class="text-slate-500"><th>Feld</th><th>Pflicht</th><th>Bedeutung</th></tr>
+    <tr><td><code class="text-cyan-300">packId</code></td><td>ja</td><td>Muss zur Pack-ID passen</td></tr>
+    <tr><td><code class="text-cyan-300">author, website</code></td><td>nein</td><td>Anzeige im Marketplace (bei installierten Packs)</td></tr>
+    <tr><td><code class="text-cyan-300">created, updated</code></td><td>nein</td><td>Datum, „Stand …“-Anzeige (Format frei, z. B. 2026-10-09)</td></tr>
+    <tr><td><code class="text-cyan-300">version</code></td><td>empfohlen</td><td>Steuert die <strong>Update-Erkennung</strong> (Fallback: packVersion, dann Eintrags-Version)</td></tr>
+    <tr><td><code class="text-cyan-300">description</code></td><td>nein</td><td>Kurzbeschreibung</td></tr>
+    <tr><td><code class="text-cyan-300">icons</code></td><td>nein</td><td>Reserviert/optional – Auswertung später</td></tr>
+  </table>
+  </div>
+  <h3 class="font-bold text-white mb-2 text-sm">Button-Aktionen</h3>
+  <div class="overflow-x-auto rounded-xl border border-white/10 mb-5">
+  <table class="w-full text-slate-300">
+    <tr class="text-slate-500"><th>action</th><th> weitere Felder</th><th>Wirkung</th></tr>
+    <tr><td><code class="text-cyan-300">toggleStyle</code></td><td><code class="text-cyan-300">field</code>: bold, italic, shadow, background, hideText</td><td>Flag umschalten</td></tr>
+    <tr><td><code class="text-cyan-300">setStyle</code></td><td><code class="text-cyan-300">field</code> + <code class="text-cyan-300">value</code>: scale, cycleMs, backgroundOpacity, staticColor, animation (OFF, SCROLL_L, SCROLL_R, PULSE, RAINBOW), template, gradient („A,B,C“), Booleans</td><td>Wert setzen</td></tr>
+    <tr><td><code class="text-cyan-300">applyPreset</code></td><td><code class="text-cyan-300">value</code>: Preset-Name (z. B. Sunset, Gold, Ocean)</td><td>Gradient-Preset anwenden</td></tr>
+    <tr><td><code class="text-cyan-300">message</code></td><td><code class="text-cyan-300">message</code></td><td>Nur Chat-Hinweis zeigen</td></tr>
+  </table>
+  </div>
+  <h3 class="font-bold text-white mb-2 text-sm">Komplett-Beispiel</h3>
+  <pre class="rounded-xl bg-black/40 border border-white/10 p-4 text-slate-300">{
+  "packId": "mein-pack", "author": "Du",
+  "website": "https://...", "created": "2026-10-09",
+  "updated": "2026-10-09", "version": "1.0.0",
+  "configMenu": {
+    "enabled": true, "title": "Mein Pack",
+    "buttons": [
+      {"id": "sunset", "label": "Sunset für alle",
+       "action": "applyPreset", "target": "style", "value": "Sunset"}
+    ]
+  },
+  "widgetButtons": [
+    {"id": "numonly", "label": "Nur Wert",
+     "action": "setStyle", "target": "style",
+     "field": "template", "value": "{value}"}
+  ]
+}</pre>
+</section>
+
+<section id="marketplace" class="rounded-2xl bg-panel border border-white/10 p-6">
+  <h2 class="font-pixel text-sm md:text-base mb-4">3. Marketplace-<span class="grad-text">Eintrag</span></h2>
+  <p class="text-sm text-slate-400 mb-3">Jeder Download-Link ist ein Eintrag in <code class="text-cyan-300">marketplace/marketplace.json</code>.
+  Einreichungen laufen per GitHub-Issue (Vorlage im Repo), der Maintainer trägt per Skript ein:</p>
+  <pre class="rounded-xl bg-black/40 border border-white/10 p-4 text-slate-300">powershell -File scripts/Add-MarketplaceEntry.ps1 `
+  -Id "mein-pack" -Name "Mein Pack" -Description "..." -Author "Du" `
+  -Version "1.0.0" -DownloadUrl "https://github.com/.../mein-pack-1.0.0.zip" `
+  -ModId "meine-mod" -JarHints "meine-mod" -CheckUrl -VerifyZip
+powershell -File scripts/Test-MarketplaceJson.ps1 -CheckUrls -VerifyZips</pre>
+  <div class="overflow-x-auto rounded-xl border border-white/10 mt-4">
+  <table class="w-full text-slate-300">
+    <tr class="text-slate-500"><th>Feld</th><th>Pflicht</th><th>Bedeutung</th></tr>
+    <tr><td><code class="text-cyan-300">id, name, downloadUrl</code></td><td>ja</td><td>ID (a-z 0-9 . _ -), Anzeigename, direkter .zip-Link</td></tr>
+    <tr><td><code class="text-cyan-300">modId, jarHints</code></td><td>ja</td><td><strong>Konflikterkennung:</strong> Fabric-ID + Dateinamen-Teile für den <code class="text-cyan-300">mods/*.jar</code>-Scan (Loader-Check + Datei-Scan + Pack-gegen-Pack)</td></tr>
+    <tr><td><code class="text-cyan-300">version, author, description, iconUrl, packType, installNote</code></td><td>nein*</td><td>Anzeige; *version empfohlen (Update-Vergleich)</td></tr>
+  </table>
+  </div>
+</section>
+
+<section id="build" class="rounded-2xl bg-panel border border-white/10 p-6">
+  <h2 class="font-pixel text-sm md:text-base mb-4">4. Mod <span class="grad-text">bauen</span> &amp; integrieren</h2>
+  <div class="grid md:grid-cols-2 gap-4 text-sm text-slate-400">
+    <div>
+      <h3 class="font-bold text-white mb-2">Mod bauen</h3>
+      <pre class="rounded-xl bg-black/40 border border-white/10 p-4 text-slate-300">JDK 25, dann:
+.\gradlew.bat build
+# Output: build/libs/flexhud-*.jar
+# Beispiel-Pack: powershell -File scripts/Build-ExamplePack.ps1</pre>
+    </div>
+    <div>
+      <h3 class="font-bold text-white mb-2">StepCount-Bridge</h3>
+      <p>FlexHUD spricht StepCount <strong class="text-white">per Reflection</strong> an
+      (<code class="text-cyan-300">com.lokro.stepcount.StepCounter</code>: start, stop, reset,
+      toggleShow, shouldShowHud, isCounting, getSteps) – kein Hard-Dep, kein Crash ohne StepCount.
+      Eigene Mods lassen sich analog anbinden (siehe <code class="text-cyan-300">StepcountBridge.java</code>).</p>
+    </div>
+    <div>
+      <h3 class="font-bold text-white mb-2">Sprache (DE/EN)</h3>
+      <p>Alle UI-Strings laufen über <code class="text-cyan-300">client/i18n/Lang</code> (Spiel-Sprache via
+      <code class="text-cyan-300">options.languageCode</code>, DE bei <code class="text-cyan-300">de*</code>, sonst EN).
+      Neue Strings <strong class="text-white">immer in beiden Maps</strong> eintragen – nie hartcodieren.</p>
+    </div>
+    <div>
+      <h3 class="font-bold text-white mb-2">Updates &amp; Layout</h3>
+      <p>Version kommt aus der Zip (<code class="text-cyan-300">.flexconfig &gt; pack.json &gt; Eintrag</code>).
+      Reinstalls sichern Positionen und spielen sie zurück; bei Strukturänderung warnt die Mod.
+      Herkunft steht in <code class="text-cyan-300">marketplace/installed.json</code>.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="border-t border-white/10">
+  <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+    <div class="flex items-center gap-2">
+      <img src="assets/logo.png" alt="" class="w-6 h-6 rounded">
+      <span>FlexHUD Developer Docs · MIT · von Lokro</span>
+    </div>
+    <div class="flex gap-4">
+      <a href="index.html" class="hover:text-cyan-300">Startseite</a>
+      <a href="https://github.com/Lokrogaming/flexhud-mod" class="hover:text-cyan-300">GitHub</a>
+      <a href="https://github.com/Lokrogaming/flexhud-mod/issues" class="hover:text-cyan-300">Issues</a>
+    </div>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>

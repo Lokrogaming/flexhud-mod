@@ -1,6 +1,11 @@
 # FlexHUD – Freie HUD-Widgets, Timer, StepCount-Bridge & Marketplace (Fabric, Client-Side)
 
+![FlexHUD Logo](docs/assets/logo.png)
+
 > **Diese README ist gleichzeitig die CurseForge-/Modrinth-Description.**
+> 🌐 **Website + Entwickler-Docs (GitHub Pages):** nach Aktivierung unter
+> `https://lokrogaming.github.io/flexhud-mod/` –
+> aktivieren via Repo → Settings → Pages → Deploy from branch → `/docs`.
 > Abschnitte sind bewusst so geschrieben, dass sie 1:1 als Projektbeschreibung übernommen werden können.
 
 ## Was ist FlexHUD?

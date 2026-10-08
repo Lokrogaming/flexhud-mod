@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlexHUD – Freie HUD-Widgets für Minecraft (Fabric)</title>
+<meta name="description" content="FlexHUD: frei positionierbare HUD-Widgets (Timer, StepCount-Bridge, Uhr, FPS, Text) mit Gradienten, Widget-Editor und eingebautem Marketplace. Fabric, client-side.">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        pixel: ['"Press Start 2P"', 'monospace'],
+        body: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      colors: {
+        void: '#0b0b14',
+        panel: '#14141f',
+        neon: '#22d3ee',
+        grape: '#a855f7',
+      }
+    }
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  body { background: #0b0b14; }
+  .grad-text { background: linear-gradient(90deg,#22d3ee,#60a5fa,#a855f7,#f472b6,#fb923c,#fde047); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .grad-border { border: 1px solid transparent; background: linear-gradient(#14141f,#14141f) padding-box, linear-gradient(135deg,#22d3ee,#a855f7) border-box; }
+  .grid-bg { background-image: linear-gradient(rgba(34,211,238,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,.06) 1px, transparent 1px); background-size: 32px 32px; }
+  code, pre { font-family: ui-monospace, monospace; }
+  pre { white-space: pre-wrap; }
+</style>
+</head>
+<body class="text-slate-200 font-body antialiased">
+<div class="grid-bg min-h-screen">
+
+<nav class="max-w-6xl mx-auto flex items-center justify-between px-4 py-5">
+  <a href="index.html" class="flex items-center gap-3">
+    <img src="assets/logo.png" alt="FlexHUD Logo" class="w-10 h-10 rounded-lg">
+    <span class="font-pixel text-sm md:text-base grad-text">FlexHUD</span>
+  </a>
+  <div class="flex items-center gap-2 md:gap-4 text-sm">
+    <a href="#features" class="px-3 py-2 rounded-lg hover:bg-white/5">Features</a>
+    <a href="#start" class="px-3 py-2 rounded-lg hover:bg-white/5">Start</a>
+    <a href="#marketplace" class="px-3 py-2 rounded-lg hover:bg-white/5">Marketplace</a>
+    <a href="developers.html" class="px-3 py-2 rounded-lg bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25 font-semibold">Entwickler</a>
+    <a href="https://github.com/Lokrogaming/flexhud-mod" class="px-3 py-2 rounded-lg hover:bg-white/5">GitHub</a>
+  </div>
+</nav>
+
+<header class="max-w-6xl mx-auto px-4 pt-10 pb-14 grid md:grid-cols-2 gap-10 items-center">
+  <div>
+    <p class="font-pixel text-[10px] md:text-xs text-cyan-300 mb-4">FABRIC · CLIENT-SIDE · MC 26.3</p>
+    <h1 class="font-pixel text-2xl md:text-4xl leading-relaxed mb-5">Dein HUD.<br><span class="grad-text">Deine Regeln.</span></h1>
+    <p class="text-slate-300 text-base md:text-lg leading-relaxed mb-6">
+      FlexHUD verwandelt festgenagelte Anzeigen in <strong class="text-white">frei verschiebbare Widgets</strong>:
+      Timer, StepCount, Uhrzeit, FPS und eigene Texte – jedes mit eigenem Gradienten,
+      Animation und Stil. Dazu gibt es einen Widget-Editor und einen
+      <strong class="text-white">eingebauten Marketplace</strong> für fertige Packs.
+    </p>
+    <div class="flex flex-wrap gap-3 mb-6">
+      <a href="https://github.com/Lokrogaming/flexhud-mod/releases" class="px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-500 text-black font-bold hover:opacity-90">Download (.jar)</a>
+      <a href="#start" class="px-5 py-3 rounded-xl grad-border font-semibold hover:bg-white/5">In 3 Schritten starten</a>
+    </div>
+    <div class="flex flex-wrap gap-2 text-xs">
+      <span class="px-2 py-1 rounded bg-white/5 border border-white/10">Minecraft 26.3</span>
+      <span class="px-2 py-1 rounded bg-white/5 border border-white/10">Fabric Loader 0.19.5</span>
+      <span class="px-2 py-1 rounded bg-white/5 border border-white/10">Fabric API</span>
+      <span class="px-2 py-1 rounded bg-white/5 border border-white/10">Java 25</span>
+      <span class="px-2 py-1 rounded bg-white/5 border border-white/10">DE / EN automatisch</span>
+    </div>
+  </div>
+  <div class="flex justify-center">
+    <img src="assets/logo.png" alt="FlexHUD Neon-Grasblock Logo" class="w-64 h-64 md:w-80 md:h-80 rounded-3xl shadow-[0_0_80px_-10px_rgba(34,211,238,.5)]">
+  </div>
+</header>
+
+<section id="features" class="max-w-6xl mx-auto px-4 pb-14">
+  <h2 class="font-pixel text-base md:text-xl mb-8">Was <span class="grad-text">drin steckt</span></h2>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grad-border rounded-2xl p-5">
+      <div class="text-2xl mb-2">⏱️</div>
+      <h3 class="font-bold text-white mb-1">Timer-Widget</h3>
+      <p class="text-sm text-slate-400">Stoppuhr mit Millisekunden-Toggle, Tages-Format und eigenen Vorlagen wie <code class="text-cyan-300">{h}:{m}:{s}.{ms}</code>.</p>
+    </div>
+    <div class="grad-border rounded-2xl p-5">
+      <div class="text-2xl mb-2">🧩</div>
+      <h3 class="font-bold text-white mb-1">Freie Widgets</h3>
+      <p class="text-sm text-slate-400">Timer, StepCount-Bridge, Uhr, FPS, Text – per Drag &amp; Drop positionieren, einzeln an/ausschalten, löschen und stylen.</p>
+    </div>
+    <div class="grad-border rounded-2xl p-5">
+      <div class="text-2xl mb-2">🎨</div>
+      <h3 class="font-bold text-white mb-1">Stil pro Widget</h3>
+      <p class="text-sm text-slate-400">Gradient-Presets, Scroll-/Puls-/Regenbogen-Animation, fett/kursiv, Schatten, Hintergrund + Deckkraft, Text an/aus – mit Live-Vorschau.</p>
+    </div>
+    <div class="grad-border rounded-2xl p-5">
+      <div class="text-2xl mb-2">🌉</div>
+      <h3 class="font-bold text-white mb-1">StepCount-Bridge</h3>
+      <p class="text-sm text-slate-400">Steuert die StepCount-Mod direkt aus FlexHUD und zeigt Steps als frei platzierbares Widget – inkl. Doppel-HUD-Warnung.</p>
+    </div>
+    <div class="grad-border rounded-2xl p-5">
+      <div class="text-2xl mb-2">🛒</div>
+      <h3 class="font-bold text-white mb-1">Marketplace</h3>
+      <p class="text-sm text-slate-400">Packs per Klick installieren, deinstallieren und aktualisieren – inkl. Konflikt-Warnung und Layout-Erhalt bei Updates.</p>
+    </div>
+    <div class="grad-border rounded-2xl p-5">
+      <div class="text-2xl mb-2">🌍</div>
+      <h3 class="font-bold text-white mb-1">Menü überall</h3>
+      <p class="text-sm text-slate-400">Hotkey <code class="text-cyan-300">H</code>, <code class="text-cyan-300">/flexhud</code> oder ModMenu-Tab – plus Update-Übersicht und Pack-Overview. Sprache folgt dem Spiel.</p>
+    </div>
+  </div>
+</section>
+
+<section id="start" class="max-w-6xl mx-auto px-4 pb-14">
+  <h2 class="font-pixel text-base md:text-xl mb-8">In <span class="grad-text">3 Schritten</span> starten</h2>
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="rounded-2xl bg-panel border border-white/10 p-5">
+      <p class="font-pixel text-cyan-300 text-xs mb-3">01</p>
+      <h3 class="font-bold text-white mb-1">Installieren</h3>
+      <p class="text-sm text-slate-400"><code class="text-cyan-300">flexhud-0.1.0.jar</code> + Fabric API in den <code class="text-cyan-300">mods/</code>-Ordner legen. Funktioniert auch auf Servern ohne Server-Mod.</p>
+    </div>
+    <div class="rounded-2xl bg-panel border border-white/10 p-5">
+      <p class="font-pixel text-cyan-300 text-xs mb-3">02</p>
+      <h3 class="font-bold text-white mb-1">Menü öffnen</h3>
+      <p class="text-sm text-slate-400"><code class="text-cyan-300">H</code> drücken oder <code class="text-cyan-300">/flexhud</code> eingeben – dann „Widgets anordnen“ und ein <code class="text-cyan-300">+ Timer</code> hinzufügen.</p>
+    </div>
+    <div class="rounded-2xl bg-panel border border-white/10 p-5">
+      <p class="font-pixel text-cyan-300 text-xs mb-3">03</p>
+      <h3 class="font-bold text-white mb-1">Ziehen &amp; stylen</h3>
+      <p class="text-sm text-slate-400">Widget in der Live-Vorschau packen und ziehen (oder Pfeiltasten), im Stil-Menü Gradient + Animation wählen – fertig.</p>
+    </div>
+  </div>
+  <div class="mt-4 rounded-2xl bg-panel border border-white/10 p-5 text-sm text-slate-400">
+    <strong class="text-white">Wichtige Befehle:</strong>
+    <code class="text-cyan-300">/timer</code> Start/Pause ·
+    <code class="text-cyan-300">/flexhud timer ms</code> Millisekunden ·
+    <code class="text-cyan-300">/flexhud stepcount show</code> StepCount-Steuerung ·
+    <code class="text-cyan-300">/flexhud updates</code> Update-Übersicht ·
+    <code class="text-cyan-300">/flexhud packs</code> Pack-Übersicht
+  </div>
+</section>
+
+<section id="marketplace" class="max-w-6xl mx-auto px-4 pb-14">
+  <h2 class="font-pixel text-base md:text-xl mb-8">Der <span class="grad-text">Marketplace</span></h2>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="rounded-2xl bg-panel border border-white/10 p-5">
+      <h3 class="font-bold text-white mb-2">Für Spieler</h3>
+      <ul class="text-sm text-slate-400 space-y-2 list-disc list-inside">
+        <li>Im Spiel öffnen (<code class="text-cyan-300">H</code> → Marketplace), Pack anklicken, fertig.</li>
+        <li>Deinstallieren geht genauso – inkl. der importierten Widgets.</li>
+        <li>Updates meldet der Chat beim Join, ein Klick öffnet die Übersicht.</li>
+        <li>Bei doppelten Modulen (z. B. StepCount-HUD + Widget) warnt die Mod.</li>
+      </ul>
+    </div>
+    <div class="rounded-2xl bg-panel border border-white/10 p-5">
+      <h3 class="font-bold text-white mb-2">Beispiel-Pack: StepCount-Bridge</h3>
+      <p class="text-sm text-slate-400 mb-3">Bindet die StepCount-Mod ein: frei platzierbares Steps-Widget im Sunset-Gradienten, eigene .flexconfig mit One-Click-Buttons, Konflikt-Warnung inklusive.</p>
+      <a href="developers.html#pack" class="text-sm text-cyan-300 hover:underline">So baust du eigene Packs → Entwickler-Docs</a>
+    </div>
+  </div>
+</section>
+
+<section class="max-w-6xl mx-auto px-4 pb-16">
+  <h2 class="font-pixel text-base md:text-xl mb-8">Häufige <span class="grad-text">Fragen</span></h2>
+  <div class="space-y-3 text-sm">
+    <details class="rounded-2xl bg-panel border border-white/10 p-5">
+      <summary class="font-bold text-white cursor-pointer">Brauche ich StepCount für FlexHUD?</summary>
+      <p class="text-slate-400 mt-2">Nein. Nur das STEPCOUNT-Widget braucht die StepCount-.jar in <code class="text-cyan-300">mods/</code>.</p>
+    </details>
+    <details class="rounded-2xl bg-panel border border-white/10 p-5">
+      <summary class="font-bold text-white cursor-pointer">Warum sehe ich Steps doppelt?</summary>
+      <p class="text-slate-400 mt-2">StepCounts natives HUD (<code class="text-cyan-300">/stepcount show</code>) und das FlexHUD-Widget laufen parallel. Einfach eines ausblenden – empfohlen: natives aus, Widget an.</p>
+    </details>
+    <details class="rounded-2xl bg-panel border border-white/10 p-5">
+      <summary class="font-bold text-white cursor-pointer">Bleibt mein Layout bei Updates erhalten?</summary>
+      <p class="text-slate-400 mt-2">Ja. Vor jedem Reinstall sichert FlexHUD Positionen und spielt sie zurück. Nur wenn das Pack seine Struktur ändert, gibt es eine Warnung.</p>
+    </details>
+    <details class="rounded-2xl bg-panel border border-white/10 p-5">
+      <summary class="font-bold text-white cursor-pointer">ModMenu-Tab fehlt?</summary>
+      <p class="text-slate-400 mt-2">ModMenu ist optional. Das Menü geht immer per Hotkey <code class="text-cyan-300">H</code> oder <code class="text-cyan-300">/flexhud</code>.</p>
+    </details>
+  </div>
+</section>
+
+<footer class="border-t border-white/10">
+  <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+    <div class="flex items-center gap-2">
+      <img src="assets/logo.png" alt="" class="w-6 h-6 rounded">
+      <span>FlexHUD · MIT-Lizenz · von Lokro</span>
+    </div>
+    <div class="flex gap-4">
+      <a href="developers.html" class="hover:text-cyan-300">Entwickler-Docs</a>
+      <a href="https://github.com/Lokrogaming/flexhud-mod" class="hover:text-cyan-300">GitHub</a>
+      <a href="https://github.com/Lokrogaming/flexhud-mod/issues" class="hover:text-cyan-300">Issues</a>
+    </div>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>
