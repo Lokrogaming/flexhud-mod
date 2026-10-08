@@ -25,6 +25,7 @@ Die Mod läuft **komplett client-seitig** – auch auf Servern ohne Server-Mod.
   Dauer, Fett/Kursiv, Schatten, Hintergrund, Skalierung, `{value}`-Vorlagen.
   Jedes Element einzeln schaltbar: **Text** (nur Wert anzeigen), Schatten,
   Hintergrund – z. B. Timer ohne „Timer:"-Label, nur die Zeit.
+  Hintergrund-Deckkraft in 20er-Schritten einstellbar.
 - 🌉 **StepCount-Bridge**: steuert die StepCount-Mod (`start/stop/reset/show`)
   und zeigt die Steps als **frei positionierbares** FlexHUD-Widget – während
   StepCounts eigenes HUD fix über der Hotbar bleibt. Inklusive
@@ -56,7 +57,9 @@ Die Mod läuft **komplett client-seitig** – auch auf Servern ohne Server-Mod.
 
 ## Schnellstart
 
-1. `H` → **Widgets anordnen** → `+ Timer` → in der Vorschau **ziehen**.
+1. `H` → **Widgets anordnen** → `+ Timer` → in der Vorschau **packen und ziehen**
+   (geht jetzt überall in der Vorschau, nicht nur direkt am Widget).
+   Feinjustierung: **Pfeiltasten** (mit Shift extra-fein) oder ◀▶▲▼-Buttons.
 2. `H` → **Stil** → Gradient-Preset + Animation wählen (z. B. Sunset + Scroll links).
 3. Timer: `/timer` (Start/Pause), `/timer reset`, oder im Menü.
 4. StepCount (falls installiert): im FlexHUD-Menü **StepCount steuern**,

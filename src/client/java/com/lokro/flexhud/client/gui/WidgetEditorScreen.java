@@ -5,6 +5,7 @@ import com.lokro.flexhud.client.config.WidgetConfig;
 import com.lokro.flexhud.client.config.WidgetType;
 import com.lokro.flexhud.client.hud.WidgetHud;
 import com.lokro.flexhud.client.util.GradientUtil;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -179,7 +180,7 @@ public class WidgetEditorScreen extends Screen {
 		}
 
 		graphics.centeredText(this.font, "FlexHUD – Widget-Editor", this.width / 2, 8, 0xFFFFFF);
-		graphics.centeredText(this.font, "Liste: wählen · Vorschau: anklicken + ziehen",
+		graphics.centeredText(this.font, "Liste: wählen · Vorschau: packen + ziehen · Pfeiltasten: Auswahl bewegen",
 			this.width / 2, 20, 0xAAAAAA);
 
 		// Detail-Infos zum gewählten Widget in der Mitte
@@ -289,7 +290,7 @@ public class WidgetEditorScreen extends Screen {
 
 	private WidgetConfig nearestWidget(double mx, double my) {
 		WidgetConfig best = null;
-		double bestDist = 16.0;
+		double bestDist = Double.MAX_VALUE;
 		for (WidgetConfig w : FlexhudConfig.get().widgets) {
 			double d = Math.hypot(mx - widgetPx(w), my - widgetPy(w));
 			if (d < bestDist) {
@@ -298,6 +299,34 @@ public class WidgetEditorScreen extends Screen {
 			}
 		}
 		return best;
+	}
+
+	/** Pfeiltasten bewegen das gewählte Widget ( Shift = fein ). */
+	@Override
+	public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+		WidgetConfig w = selected();
+		if (w != null && !FlexhudConfig.get().widgets.isEmpty()) {
+			float step = (event.modifiers() & 0x1) != 0 ? 0.002f : 0.01f;
+			int k = event.key();
+			int kc = event.keycode();
+			if (k == InputConstants.KEY_LEFT || kc == InputConstants.KEY_LEFT) {
+				nudge(-step, 0);
+				return true;
+			}
+			if (k == InputConstants.KEY_RIGHT || kc == InputConstants.KEY_RIGHT) {
+				nudge(step, 0);
+				return true;
+			}
+			if (k == InputConstants.KEY_UP || kc == InputConstants.KEY_UP) {
+				nudge(0, -step);
+				return true;
+			}
+			if (k == InputConstants.KEY_DOWN || kc == InputConstants.KEY_DOWN) {
+				nudge(0, step);
+				return true;
+			}
+		}
+		return super.keyPressed(event);
 	}
 
 	private void moveTo(WidgetConfig w, double mx, double my) {

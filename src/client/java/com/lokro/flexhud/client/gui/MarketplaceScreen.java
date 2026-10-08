@@ -119,7 +119,13 @@ public class MarketplaceScreen extends Screen {
 			y += 44;
 		}
 
-		int fw = Math.max(70, Math.min(110, (this.width - 40) / 4));
+		// Footer: 4 Buttons teilen sich die Breite gleichmäßig (kein Überlappen möglich)
+		int gap = 5;
+		int bw = (this.width - 20 - gap * 3) / 4;
+		if (bw < 40) {
+			bw = 40;
+		}
+		int fy = this.height - 26;
 		addRenderableWidget(Button.builder(Component.literal("◀"),
 			b -> {
 				if (page > 0) {
@@ -127,23 +133,23 @@ public class MarketplaceScreen extends Screen {
 					pendingUninstall = null;
 					rebuildWidgets();
 				}
-			}).bounds(10, this.height - 26, fw, 20).build());
-		addRenderableWidget(Button.builder(Component.literal("Aktualisieren"),
+			}).bounds(10, fy, bw, 20).build());
+		addRenderableWidget(Button.builder(Component.literal("Neu laden"),
 			b -> {
 				pendingUninstall = null;
 				MarketplaceCache.refreshAsync();
 				status = "Aktualisiere …";
-			}).bounds(10 + fw + 5, this.height - 26, fw + 20, 20).build());
-		addRenderableWidget(Button.builder(Component.literal("Weiter ▶"),
+			}).bounds(10 + (bw + gap), fy, bw, 20).build());
+		addRenderableWidget(Button.builder(Component.literal("▶"),
 			b -> {
 				if ((page + 1) * PER_PAGE < MarketplaceCache.entries().size()) {
 					page++;
 					pendingUninstall = null;
 					rebuildWidgets();
 				}
-			}).bounds(this.width - 10 - fw - (fw + 20) - 5 - fw, this.height - 26, fw, 20).build());
+			}).bounds(10 + (bw + gap) * 2, fy, bw, 20).build());
 		addRenderableWidget(Button.builder(Component.literal("Fertig"),
-			b -> onClose()).bounds(this.width - 10 - fw, this.height - 26, fw, 20).build());
+			b -> onClose()).bounds(10 + (bw + gap) * 3, fy, bw, 20).build());
 
 		if (MarketplaceCache.lastError() != null && all.isEmpty()) {
 			status = "Offline/Fehler: " + MarketplaceCache.lastError();

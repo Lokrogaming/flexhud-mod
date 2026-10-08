@@ -85,6 +85,20 @@ public class StyleEditScreen extends Screen {
 		addRenderableWidget(Button.builder(Component.literal("Text: " + anAus(!w.style.hideText)),
 			b -> toggle(b, "Text")).bounds(cx - 150, y, 300, 20).build());
 		y += 24;
+		addRenderableWidget(Button.builder(Component.literal("Deckkraft - (" + w.style.backgroundOpacity + ")"),
+			b -> {
+				w.style.backgroundOpacity = Math.max(0, w.style.backgroundOpacity - 20);
+				FlexhudConfig.save();
+				rebuildWidgets();
+			}).bounds(cx - 150, y, 148, 20).build());
+		addRenderableWidget(Button.builder(Component.literal("Deckkraft + (" + w.style.backgroundOpacity + ")"),
+			b -> {
+				w.style.backgroundOpacity = Math.min(255, w.style.backgroundOpacity + 20);
+				w.style.background = true; // Deckkraft erhöhen blendet den Hintergrund ein
+				FlexhudConfig.save();
+				rebuildWidgets();
+			}).bounds(cx + 2, y, 148, 20).build());
+		y += 24;
 		addRenderableWidget(Button.builder(Component.literal("Preset: " + presetName()),
 			b -> {
 				applyNextPreset();
