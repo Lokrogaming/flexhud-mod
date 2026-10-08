@@ -59,7 +59,7 @@ public final class FlexhudConfig {
 						loaded.widgets = defaultWidgets();
 					}
 					if (loaded.marketplaceUrl == null || loaded.marketplaceUrl.isBlank()
-						|| loaded.marketplaceUrl.contains("/main/marketplace.json")
+						|| loaded.marketplaceUrl.contains("/flexhud-mod/main/")
 						|| loaded.marketplaceUrl.contains("githubusercontent.com/lokro/")) {
 						// Selbstheilung: alte kaputte URLs (falscher User/Branch) ersetzen.
 						loaded.marketplaceUrl = defaultMarketplaceUrl();
