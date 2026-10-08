@@ -46,5 +46,16 @@ public class FlexhudClient implements ClientModInitializer {
 
 		FlexhudMod.LOGGER.info("[FlexHUD] Client initialisiert: Hotkey H, /flexhud, /timer. Widgets: {}",
 			FlexhudConfig.get().widgets.size());
+		FlexhudMod.LOGGER.info("[FlexHUD] Version: {}, Marketplace-URL: {}",
+			modVersion(), FlexhudConfig.get().marketplaceUrl);
+	}
+
+	private static String modVersion() {
+		try {
+			return net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer("flexhud")
+				.map(c -> c.getMetadata().getVersion().getFriendlyString()).orElse("?");
+		} catch (Exception e) {
+			return "?";
+		}
 	}
 }

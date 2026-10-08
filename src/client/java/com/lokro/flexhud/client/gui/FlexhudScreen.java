@@ -145,7 +145,7 @@ public class FlexhudScreen extends Screen {
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
 		graphics.fill(0, 0, this.width, this.height, 0xA0000000);
 		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
-		graphics.centeredText(this.font, Lang.t("menu.head"), this.width / 2, 12, 0xFFFFFF);
+		graphics.centeredText(this.font, Lang.t("menu.head") + "  v" + modVersion(), this.width / 2, 12, 0xFFFFFF);
 		String step = StepcountBridge.installed()
 			? Lang.f("menu.step_found", StepcountBridge.getSteps())
 			: Lang.t("menu.step_missing");
@@ -179,6 +179,15 @@ public class FlexhudScreen extends Screen {
 		Minecraft client = Minecraft.getInstance();
 		if (client != null && client.player != null) {
 			client.player.sendSystemMessage(Component.literal("§b[FlexHUD] §f" + msg));
+		}
+	}
+
+	private static String modVersion() {
+		try {
+			return net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer("flexhud")
+				.map(c -> c.getMetadata().getVersion().getFriendlyString()).orElse("?");
+		} catch (Exception e) {
+			return "?";
 		}
 	}
 }
