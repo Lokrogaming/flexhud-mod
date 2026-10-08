@@ -54,7 +54,7 @@
 - [ ] **Icon**: `assets/flexhud/icon.png` ist aktuell eine Kopie des StepCount-Icons
   (Platzhalter!). Vor CurseForge/Modrinth-Upload ersetzen.
 - [ ] **`marketplace.json`-URL**: Default zeigt auf
-  `raw.githubusercontent.com/lokro/flexhud-mod/...`. Nach Repo-Erstellung prüfen,
+  `raw.githubusercontent.com/Lokrogaming/flexhud-mod/...`. Nach Repo-Erstellung prüfen,
   ob User/Org-Name stimmt, sonst in `gradle.properties` + `FlexhudConfig` anpassen.
 - [ ] **GitHub-Releases**: `scripts/Release-StepCountPack.ps1` nur vorbereitet,
   NICHT ausgeführt (kein Remote/Remote-Name bekannt, kein blindes Pushen).

@@ -162,8 +162,8 @@ Offline/URL falsch? Die Mod nutzt einen lokalen Cache; Button
 
 ## Links
 
-- FlexHUD-Repo: `https://github.com/lokro/flexhud-mod`
-- Marketplace-JSON: `https://raw.githubusercontent.com/lokro/flexhud-mod/main/marketplace/marketplace.json`
+- FlexHUD-Repo: `https://github.com/Lokrogaming/flexhud-mod`
+- Marketplace-JSON: `https://raw.githubusercontent.com/Lokrogaming/flexhud-mod/main/marketplace/marketplace.json`
 - StepCount-Mod: siehe StepCount-Repo (Bridge-Ziel)
 
 ## Lizenz

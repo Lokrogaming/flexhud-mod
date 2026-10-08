@@ -8,7 +8,7 @@
       "author": "Lokro",
       "version": "1.0.0",
       "iconUrl": "",
-      "downloadUrl": "https://github.com/lokro/stepcount-mod/releases/download/flexhud-pack-v1.0.0/stepcount-bridge-pack-1.0.0.zip",
+      "downloadUrl": "https://github.com/Lokrogaming/flexhud-mod/releases/download/marketplace-test-v1/stepcount-bridge-pack-1.0.0.zip",
       "modId": "stepcount",
       "jarHints": ["stepcount-mod", "stepcount"],
       "packType": "bridge",

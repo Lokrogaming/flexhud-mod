@@ -16,7 +16,7 @@
 param(
   [string]$StepCountRepo = "C:\Users\lokro\projekte\stepcount-mod",
   [string]$FlexHudRepo = "C:\Users\lokro\projekte\flexhud-mod",
-  [string]$GhRepo = "lokro/stepcount-mod",
+  [string]$GhRepo = "Lokrogaming/flexhud-mod",
   [string]$Tag = "flexhud-pack-v1.0.0",
   [string]$Title = "FlexHUD Bridge-Pack v1.0.0 (+ StepCount jar)",
   [string]$ModVersion = "1.0.0",

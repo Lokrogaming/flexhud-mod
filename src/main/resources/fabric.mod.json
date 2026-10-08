@@ -8,9 +8,9 @@
 		"Lokro"
 	],
 	"contact": {
-		"homepage": "https://github.com/lokro/flexhud-mod",
-		"sources": "https://github.com/lokro/flexhud-mod",
-		"issues": "https://github.com/lokro/flexhud-mod/issues"
+		"homepage": "https://github.com/Lokrogaming/flexhud-mod",
+		"sources": "https://github.com/Lokrogaming/flexhud-mod",
+		"issues": "https://github.com/Lokrogaming/flexhud-mod/issues"
 	},
 	"license": "MIT",
 	"icon": "assets/flexhud/icon.png",

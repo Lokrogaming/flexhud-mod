@@ -36,7 +36,7 @@ public final class FlexhudConfig {
 
 	private static String defaultMarketplaceUrl() {
 		// Aus gradle.properties übernommen; Fallback auf Repo-Pfad.
-		return "https://raw.githubusercontent.com/lokro/flexhud-mod/main/marketplace/marketplace.json";
+		return "https://raw.githubusercontent.com/Lokrogaming/flexhud-mod/main/marketplace/marketplace.json";
 	}
 
 	private static List<WidgetConfig> defaultWidgets() {
