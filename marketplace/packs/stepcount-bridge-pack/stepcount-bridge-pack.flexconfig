@@ -1,0 +1,26 @@
+{
+  "_comment": "FlexConfig des StepCount-Bridge-Packs (Beispiel). Meta erscheint im Marketplace, configMenu im Overview-Menü (muss deklariert sein!), widgetButtons im Stil-Menü bei Pack-Widgets. Icons: reserviert/optional, Auswertung später.",
+  "packId": "stepcount-bridge-pack",
+  "packName": "StepCount-Bridge-Pack",
+  "author": "Lokro",
+  "website": "https://github.com/Lokrogaming/flexhud-mod",
+  "created": "2026-10-08",
+  "updated": "2026-10-09",
+  "version": "1.0.0",
+  "description": "Bindet die StepCount-Mod an FlexHUD ein (frei positionierbares Steps-Widget).",
+  "icons": {},
+  "configMenu": {
+    "enabled": true,
+    "title": "StepCount-Bridge",
+    "buttons": [
+      {"id": "sunset", "label": "Sunset für alle Steps", "action": "applyPreset", "target": "style", "value": "Sunset"},
+      {"id": "shadow", "label": "Schatten umschalten", "action": "toggleStyle", "target": "style", "field": "shadow"},
+      {"id": "big", "label": "Groß (Scale 1.5)", "action": "setStyle", "target": "style", "field": "scale", "value": "1.5"},
+      {"id": "help", "label": "Hilfe", "action": "message", "message": "Natives StepCount-HUD mit /stepcount show ausblenden, Rest macht FlexHUD."}
+    ]
+  },
+  "widgetButtons": [
+    {"id": "numonly", "label": "Nur Steps-Zahl", "action": "setStyle", "target": "style", "field": "template", "value": "{value}"},
+    {"id": "gold", "label": "Gold-Preset", "action": "applyPreset", "target": "style", "value": "Gold"}
+  ]
+}

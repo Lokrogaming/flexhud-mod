@@ -73,17 +73,35 @@ public final class ConflictChecker {
 		if (!c.any()) {
 			return null;
 		}
-		String modLabel = entry.modId == null || entry.modId.isBlank() ? "die zugehörige Mod" : "»" + entry.modId + "«";
+		String modLabel = entry.modId == null || entry.modId.isBlank()
+			? com.lokro.flexhud.client.i18n.Lang.t("conflict.modlabel")
+			: "»" + entry.modId + "«";
 		if (c.loadedNow() && c.jarInstalled()) {
-			return "ACHTUNG: " + modLabel + " ist installiert + geladen ("
-				+ c.jarName() + "). Module können sich überschneiden (doppeltes HUD). "
-				+ "Tipp: StepCount-HUD mit /stepcount show ausblenden und FlexHUD-Widget nutzen.";
+			return com.lokro.flexhud.client.i18n.Lang.f("conflict.both", modLabel, c.jarName());
 		}
 		if (c.loadedNow()) {
-			return "Hinweis: " + modLabel + " ist gerade geladen. Doppelte Anzeigen möglich – "
-				+ "ein HUD davon ausblenden.";
+			return com.lokro.flexhud.client.i18n.Lang.f("conflict.loaded", modLabel);
 		}
-		return "Hinweis: " + modLabel + " als Datei gefunden (" + c.jarName()
-			+ "). Falls beide HUDs aktiv sind, eines ausblenden.";
+		return com.lokro.flexhud.client.i18n.Lang.f("conflict.jar", modLabel, c.jarName());
+	}
+
+	/**
+	 * Erkennt per Paket-/Mod-Namen, ob dieselbe Mod schon als ANDERES Pack
+	 * installiert ist (installed.json). Gibt Warntext zurück oder null.
+	 */
+	public static String packConflictText(MarketplaceEntry entry) {
+		if (entry.modId == null || entry.modId.isBlank()) {
+			return null;
+		}
+		for (var en : InstalledRegistry.load().entrySet()) {
+			if (en.getKey().equals(entry.id)) {
+				continue;
+			}
+			InstalledRegistry.Entry rec = en.getValue();
+			if (rec != null && entry.modId.equalsIgnoreCase(rec.modId)) {
+				return com.lokro.flexhud.client.i18n.Lang.f("conflict.pack", entry.modId, en.getKey());
+			}
+		}
+		return null;
 	}
 }

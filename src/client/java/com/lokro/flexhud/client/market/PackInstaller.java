@@ -27,16 +27,7 @@ import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-/**
- * Lädt Marketplace-Zips (z.B. GitHub-Release-Assets) herunter nach
- * {@code flexhud/marketplace/downloaded/} und entpackt sie nach
- * {@code flexhud/marketplace/packs/<id>/}.
- *
- * <p>Enthält die Zip eine {@code pack.json} mit {@code widgets[]}, werden diese
- * als neue Widgets in die Config übernommen (mit frischen IDs). Die Herkunft
- * wird in {@link InstalledRegistry} festgehalten, damit Deinstallieren die
- * Pack-Dateien UND die importierten Widgets wieder entfernen kann.
- */
+/** Marketplace-Downloads: Zip laden, entpacken, Widgets importieren (Herkunft -> InstalledRegistry). */
 public final class PackInstaller {
 	private PackInstaller() {}
 
@@ -44,12 +35,19 @@ public final class PackInstaller {
 
 	public static boolean isInstalled(MarketplaceEntry entry) {
 		try {
-			Path marker = MarketplaceCache.packsDir().resolve(entry.id).resolve("pack.json");
+			Path marker = MarketplaceCache.packsDir().resolve(safeId(entry.id)).resolve("pack.json");
 			if (Files.isRegularFile(marker)) {
 				return true;
 			}
-			return Files.isRegularFile(MarketplaceCache.downloadedDir()
-				.resolve(safeName(entry) + ".zip"));
+			Path dl = MarketplaceCache.downloadedDir();
+			if (Files.isDirectory(dl)) {
+				try (var ds = Files.newDirectoryStream(dl, safeId(entry.id) + "-*.zip")) {
+					for (Path ignored : ds) {
+						return true;
+					}
+				}
+			}
+			return InstalledRegistry.get(entry.id) != null;
 		} catch (Exception e) {
 			return false;
 		}
@@ -62,7 +60,8 @@ public final class PackInstaller {
 				done.accept(msg);
 			} catch (Exception e) {
 				FlexhudMod.LOGGER.warn("[FlexHUD] Installation von '{}' fehlgeschlagen.", entry.id, e);
-				done.accept("FEHLER: " + e.getClass().getSimpleName() + ": " + String.valueOf(e.getMessage()));
+				done.accept(com.lokro.flexhud.client.i18n.Lang.f("install.fail",
+					e.getClass().getSimpleName(), String.valueOf(e.getMessage())));
 			}
 		});
 	}
@@ -73,12 +72,13 @@ public final class PackInstaller {
 				done.accept(uninstall(entry));
 			} catch (Exception e) {
 				FlexhudMod.LOGGER.warn("[FlexHUD] Deinstallation von '{}' fehlgeschlagen.", entry.id, e);
-				done.accept("FEHLER: " + e.getClass().getSimpleName() + ": " + String.valueOf(e.getMessage()));
+				done.accept(com.lokro.flexhud.client.i18n.Lang.f("install.fail",
+					e.getClass().getSimpleName(), String.valueOf(e.getMessage())));
 			}
 		});
 	}
 
-	/** Zählt noch vorhandene Widgets, die aus diesem Pack importiert wurden. */
+	/** Noch vorhandene Pack-Widgets zählen. */
 	public static int importedWidgetCount(MarketplaceEntry entry) {
 		InstalledRegistry.Entry rec = InstalledRegistry.get(entry.id);
 		if (rec == null || rec.widgetIds == null) {
@@ -93,28 +93,9 @@ public final class PackInstaller {
 		return n;
 	}
 
-	/**
-	 * Deinstalliert ein Pack: löscht entpackte Dateien + heruntergeladene Zip(s)
-	 * sowie alle noch vorhandenen Widgets, die aus dem Pack importiert wurden.
-	 */
+	/** Pack deinstallieren (Dateien + importierte Widgets). */
 	static String uninstall(MarketplaceEntry entry) throws Exception {
-		List<String> removedFiles = new ArrayList<>();
-
-		Path packDir = MarketplaceCache.packsDir().resolve(safeId(entry.id));
-		if (Files.isDirectory(packDir)) {
-			deleteRecursive(packDir);
-			removedFiles.add("packs/" + safeId(entry.id) + "/");
-		}
-		Path dl = MarketplaceCache.downloadedDir();
-		if (Files.isDirectory(dl)) {
-			String prefix = safeId(entry.id) + "-";
-			try (var ds = Files.newDirectoryStream(dl, prefix + "*.zip")) {
-				for (Path zip : ds) {
-					Files.deleteIfExists(zip);
-					removedFiles.add("downloaded/" + zip.getFileName());
-				}
-			}
-		}
+		List<String> removedFiles = removePackFiles(entry);
 
 		InstalledRegistry.Entry rec = InstalledRegistry.get(entry.id);
 		int removedWidgets = 0;
@@ -133,11 +114,14 @@ public final class PackInstaller {
 		InstalledRegistry.remove(entry.id);
 
 		boolean hadRecord = rec != null;
-		String msg = "Deinstalliert: " + entry.name
-			+ " (" + (removedFiles.isEmpty() ? "keine Dateien mehr da" : String.join(", ", removedFiles))
-			+ (removedWidgets > 0 ? ", " + removedWidgets + " Widget(s) entfernt" : "")
-			+ (hadRecord ? "" : ", Hinweis: keine Widget-Zuordnung gespeichert (alter Install)")
-			+ ").";
+		String msg = com.lokro.flexhud.client.i18n.Lang.f("uninstall.ok", entry.name,
+			removedFiles.isEmpty()
+				? com.lokro.flexhud.client.i18n.Lang.t("uninstall.nofiles")
+				: String.join(", ", removedFiles),
+			removedWidgets > 0
+				? com.lokro.flexhud.client.i18n.Lang.f("uninstall.widgets", removedWidgets)
+				: "",
+			hadRecord ? "" : com.lokro.flexhud.client.i18n.Lang.t("uninstall.norecord"));
 		FlexhudMod.LOGGER.info("[FlexHUD] {}", msg);
 		return msg;
 	}
@@ -154,8 +138,6 @@ public final class PackInstaller {
 		Files.createDirectories(MarketplaceCache.downloadedDir());
 		Files.createDirectories(MarketplaceCache.packsDir());
 
-		Path zip = MarketplaceCache.downloadedDir().resolve(safeName(entry) + ".zip");
-
 		HttpClient client = HttpClient.newBuilder()
 			.connectTimeout(Duration.ofSeconds(10))
 			.followRedirects(HttpClient.Redirect.NORMAL)
@@ -165,29 +147,106 @@ public final class PackInstaller {
 			.header("User-Agent", "FlexHUD/0.1.0 (Minecraft-Mod)")
 			.GET()
 			.build();
-		HttpResponse<Path> res = client.send(req, HttpResponse.BodyHandlers.ofFile(
-			Files.createTempFile("flexhud-pack-", ".zip")));
+		Path tmp = Files.createTempFile("flexhud-pack-", ".zip");
+		HttpResponse<Path> res = client.send(req, HttpResponse.BodyHandlers.ofFile(tmp));
 		if (res.statusCode() < 200 || res.statusCode() >= 300) {
+			Files.deleteIfExists(tmp);
 			throw new IllegalStateException("Download HTTP " + res.statusCode());
 		}
-		Files.move(res.body(), zip, StandardCopyOption.REPLACE_EXISTING);
+
+		String remoteVersion = FlexConfig.readVersion(tmp, entry);
+
+		// Update/Reinstall: altes Layout sichern, dann alte Widgets + Dateien entfernen.
+		// Erst HIER (Download steht) – bei Netzwerkfehler bleibt der alte Stand heil.
+		List<WidgetConfig> backup = new ArrayList<>();
+		boolean hadOld = InstalledRegistry.get(entry.id) != null;
+		if (hadOld) {
+			InstalledRegistry.Entry old = InstalledRegistry.get(entry.id);
+			if (old.widgetIds != null) {
+				for (String wid : old.widgetIds) {
+					WidgetConfig w = FlexhudConfig.get().byId(wid);
+					if (w != null) {
+						backup.add(w.copy());
+						FlexhudConfig.get().widgets.remove(w);
+					}
+				}
+			}
+			if (!backup.isEmpty()) {
+				InstalledRegistry.saveBackup(entry.id, backup);
+				FlexhudConfig.save();
+			}
+			removePackFiles(entry);
+		}
+
+		Path zip = MarketplaceCache.downloadedDir().resolve(safeName(entry, remoteVersion) + ".zip");
+		Files.move(tmp, zip, StandardCopyOption.REPLACE_EXISTING);
 
 		Path target = MarketplaceCache.packsDir().resolve(safeId(entry.id));
 		unzip(zip, target);
 
 		List<String> importedIds = importWidgets(target);
-		InstalledRegistry.recordInstall(entry.id, entry.version, importedIds);
+		InstalledRegistry.recordInstall(entry.id, remoteVersion, entry.modId, importedIds);
+
+		// Layout zurückspielen (positionsweise); bei Strukturänderung warnen + Backup weg.
+		String layoutNote = "";
+		if (hadOld && !backup.isEmpty()) {
+			if (backup.size() == importedIds.size()) {
+				for (int i = 0; i < importedIds.size(); i++) {
+					WidgetConfig fresh = FlexhudConfig.get().byId(importedIds.get(i));
+					WidgetConfig oldW = backup.get(i);
+					if (fresh != null) {
+						fresh.x = oldW.x;
+						fresh.y = oldW.y;
+						fresh.style.scale = oldW.style.scale;
+					}
+				}
+				FlexhudConfig.save();
+				layoutNote = com.lokro.flexhud.client.i18n.Lang.t("install.layout_kept");
+			} else {
+				layoutNote = com.lokro.flexhud.client.i18n.Lang.t("install.layout_lost");
+			}
+			InstalledRegistry.clearBackup(entry.id);
+		}
+
+		String packWarn = ConflictChecker.packConflictText(entry);
 
 		ConflictChecker.Conflict c = ConflictChecker.check(entry);
 		String warn = ConflictChecker.warnText(entry, c);
+		if (packWarn != null) {
+			warn = (warn == null ? "" : warn + "\n") + packWarn;
+		}
 
-		String ok = "Installiert: " + entry.name + " v" + entry.version
-			+ " (" + zip.getFileName() + (!importedIds.isEmpty() ? ", " + importedIds.size() + " Widget(s) übernommen" : "") + ").";
-		if (warn != null) {
+		String ok = com.lokro.flexhud.client.i18n.Lang.f("install.ok", entry.name, remoteVersion,
+			zip.getFileName().toString(),
+			importedIds.isEmpty() ? ""
+				: com.lokro.flexhud.client.i18n.Lang.f("install.widgets", importedIds.size()),
+			layoutNote);
+		if (warn != null && !warn.isEmpty()) {
 			ok += "\n" + warn;
 		}
 		FlexhudMod.LOGGER.info("[FlexHUD] {}", ok.replace("\n", " "));
 		return ok;
+	}
+
+	/** Pack-Ordner + Zips löschen. */
+	static List<String> removePackFiles(MarketplaceEntry entry) throws Exception {
+		List<String> removed = new ArrayList<>();
+		Path packDir = MarketplaceCache.packsDir().resolve(safeId(entry.id));
+		if (Files.isDirectory(packDir)) {
+			deleteRecursive(packDir);
+			removed.add("packs/" + safeId(entry.id) + "/");
+		}
+		Path dl = MarketplaceCache.downloadedDir();
+		if (Files.isDirectory(dl)) {
+			String prefix = safeId(entry.id) + "-";
+			try (var ds = Files.newDirectoryStream(dl, prefix + "*.zip")) {
+				for (Path zip : ds) {
+					Files.deleteIfExists(zip);
+					removed.add("downloaded/" + zip.getFileName());
+				}
+			}
+		}
+		return removed;
 	}
 
 	private static void unzip(Path zip, Path target) throws Exception {
@@ -213,7 +272,7 @@ public final class PackInstaller {
 		}
 	}
 
-	/** Liest packs/<id>/pack.json, übernimmt Widgets und gibt deren neue IDs zurück. */
+	/** Widgets aus pack.json übernehmen (gibt neue IDs zurück). */
 	static List<String> importWidgets(Path packDir) {
 		List<String> ids = new ArrayList<>();
 		Path packJson = packDir.resolve("pack.json");
@@ -257,7 +316,8 @@ public final class PackInstaller {
 		return id.replaceAll("[^a-zA-Z0-9._-]", "_");
 	}
 
-	private static String safeName(MarketplaceEntry e) {
-		return safeId(e.id) + "-" + safeId(e.version);
+	private static String safeName(MarketplaceEntry e, String version) {
+		String v = (version == null || version.isBlank()) ? e.version : version;
+		return safeId(e.id) + "-" + safeId(v == null ? "?" : v);
 	}
 }

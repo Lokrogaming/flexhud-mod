@@ -18,6 +18,10 @@ Die Mod läuft **komplett client-seitig** – auch auf Servern ohne Server-Mod.
 
 - ⏱️ **Timer-Widget** über der Hotbar (wie StepCount) – Start/Stopp/Reset per
   Hotkey, Command oder Menü. Überlebt Neustarts (wird pausiert gespeichert).
+  Millisekunden pro Button/Command (`/flexhud timer ms`) an-/abschaltbar,
+  Format wächst automatisch (M:SS → H:MM:SS → dD H:MM:SS). Vorlagen mit
+  `{value}` oder einzeln: `{d}` Tage, `{h}` Stunden, `{m}` Minuten,
+  `{s}` Sekunden, `{ms}` Millisekunden (z. B. `{h}:{m}:{s}.{ms}`).
 - 🧩 **Widget-System**: TIMER, STEPCOUNT-Bridge, UHR, TEXT, FPS – adden, löschen,
   an/ausschalten, **frei positionieren** (relativ, also auflösungsunabhängig).
 - 🎨 **Style pro Widget**: Gradient-Presets (u. a. StepCount-Classic, Ocean, Sunset,
@@ -34,6 +38,15 @@ Die Mod läuft **komplett client-seitig** – auch auf Servern ohne Server-Mod.
   (Name, Beschreibung, Icon, **Download-Link**), lädt Zips (z. B. GitHub-Releases)
   nach `flexhud/marketplace/downloaded/` und installiert sie automatisch nach
   `flexhud/marketplace/packs/<id>/` (inkl. Widget-Import aus `pack.json`).
+- 🔧 **Pack-Updates**: Beim Spielstart prüft FlexHUD alle Pack-Links
+  (Version aus `.flexconfig`/`pack.json`, Temp-Dateien werden danach gelöscht).
+  Beim Weltbeitritt meldet der Chat zählbar Updates vs. Probleme
+  (nicht verfügbar/kaputt/gesperrt) – Klick öffnet die **Update-Übersicht**
+  (`/flexhud updates`) für Einzel- oder Alle-Updates. Reinstalls übernehmen
+  dein Layout automatisch (bei geänderter Pack-Struktur: Warnung).
+- 📦 **Pack-Übersicht** (`/flexhud packs`): installierte Packs mit ihren
+  `.flexconfig`-Menüs (Custom-Buttons wirken auf alle Pack-Widgets).
+- 🌍 **Sprache automatisch**: Deutsch bei deutschem Spiel, sonst Englisch.
 - ⚠️ **Konflikterkennung**: Jedes Pack MUSS `modId` + `jarHints` angeben.
   FlexHUD prüft Fabric-Loader UND scannt `mods/*.jar` – und warnt, wenn sich
   Module überschneiden können.
@@ -120,6 +133,47 @@ Die Mod läuft **komplett client-seitig** – auch auf Servern ohne Server-Mod.
 > `modId` = Fabric-Mod-ID (aus `fabric.mod.json`), `jarHints` = Dateinamen-Teile
 > zur `.jar`-Erkennung (z. B. `["stepcount-mod", "stepcount"]`). Ohne diese Felder
 > kann FlexHUD **nicht** vor doppelten Modulen warnen!
+
+## Eigene `.flexconfig` (für Pack-Autoren, optional aber empfohlen)
+
+Eine `*.flexconfig`-Datei im Zip-Root (Name frei, z. B. `mein-pack.flexconfig`)
+liefert Meta + Custom-Buttons. Vorlage: siehe StepCount-Bridge-Pack im Repo.
+
+```json
+{
+  "packId": "mein-pack",
+  "author": "Du",
+  "website": "https://...",
+  "created": "2026-10-09",
+  "updated": "2026-10-09",
+  "version": "1.0.0",
+  "description": "...",
+  "icons": {},
+  "configMenu": {
+    "enabled": true,
+    "title": "Mein Pack",
+    "buttons": [
+      {"id": "sunset", "label": "Sunset für alle", "action": "applyPreset", "target": "style", "value": "Sunset"},
+      {"id": "shadow", "label": "Schatten umschalten", "action": "toggleStyle", "target": "style", "field": "shadow"}
+    ]
+  },
+  "widgetButtons": [
+    {"id": "numonly", "label": "Nur Wert", "action": "setStyle", "target": "style", "field": "template", "value": "{value}"}
+  ]
+}
+```
+
+- **Meta** (`author`, `website`, `created`/`updated`, `version` …) wird im
+  Marketplace bei installierten Packs angezeigt; `version` steuert die
+  Update-Erkennung (fällt zurück auf `packVersion`, dann Eintrags-Version).
+- **`configMenu`** (muss explizit deklariert sein!) erscheint im
+  **Overview-Menü** (`/flexhud packs`) und wirkt auf **alle** Pack-Widgets.
+- **`widgetButtons`** erscheinen im **Stil-Menü** (★-Buttons) und wirken aufs
+  gewählte Widget. Ohne diese Blöcke gibt es schlicht keine Extra-Buttons.
+- **Aktionen**: `toggleStyle` (Felder: bold, italic, shadow, background, hideText),
+  `setStyle` (scale, cycleMs, backgroundOpacity, staticColor, animation,
+  template, gradient als Kommaliste, Booleans), `applyPreset` (Preset-Name),
+  `message` (Chat-Hinweis). `icons` ist reserviert/optional – Auswertung später.
 
 ## Marketplace-Einträge verwalten (für Maintainer)
 

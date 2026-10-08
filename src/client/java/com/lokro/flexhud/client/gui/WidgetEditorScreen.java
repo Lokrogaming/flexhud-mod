@@ -4,6 +4,7 @@ import com.lokro.flexhud.client.config.FlexhudConfig;
 import com.lokro.flexhud.client.config.WidgetConfig;
 import com.lokro.flexhud.client.config.WidgetType;
 import com.lokro.flexhud.client.hud.WidgetHud;
+import com.lokro.flexhud.client.i18n.Lang;
 import com.lokro.flexhud.client.util.GradientUtil;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
@@ -14,15 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Util;
 
-/**
- * Widget-Editor: Widgets adden/löschen/an-aus, per Drag in der Live-Vorschau
- * frei positionieren, Skalierung ändern, Stil-Editor öffnen.
- *
- * <p>Layout ist responsiv (keine fixen Pixel-Annahmen): links die Widget-Liste,
- * rechts die Aktionen, unten eine Live-Vorschau, die alle Widgets mit ihrem
- * ECHTEN Stil (Gradient + Animation) rendert. Klick in der Vorschau wählt das
- * nächste Widget, Ziehen verschiebt es.
- */
+/** Widget-Editor: Liste + Aktionen + Live-Vorschau (Klick wählt, Ziehen bewegt). */
 public class WidgetEditorScreen extends Screen {
 	private final Screen parent;
 	private String selectedId = null;
@@ -34,7 +27,7 @@ public class WidgetEditorScreen extends Screen {
 	private int prevX, prevY, prevW, prevH;
 
 	public WidgetEditorScreen(Screen parent) {
-		super(Component.literal("FlexHUD – Widget-Editor"));
+		super(Component.literal(Lang.t("editor.title")));
 		this.parent = parent;
 		FlexhudConfig cfg = FlexhudConfig.get();
 		if (!cfg.widgets.isEmpty()) {
@@ -92,7 +85,7 @@ public class WidgetEditorScreen extends Screen {
 		for (int i = listPage * ps; i < Math.min(cfg.widgets.size(), (listPage + 1) * ps); i++) {
 			WidgetConfig w = cfg.widgets.get(i);
 			String label = (w.id.equals(selectedId) ? "> " : "")
-				+ w.id + " [" + w.type.displayName() + "] " + (w.enabled ? "AN" : "AUS");
+				+ w.id + " [" + w.type.displayName() + "] " + Lang.t(w.enabled ? "on" : "off");
 			if (label.length() > 32) {
 				label = label.substring(0, 32) + "…";
 			}
@@ -106,7 +99,7 @@ public class WidgetEditorScreen extends Screen {
 			y += 22;
 		}
 		if (pages > 1) {
-			String pg = "Seite " + (listPage + 1) + "/" + pages;
+			String pg = Lang.f("editor.page", (listPage + 1), pages);
 			addRenderableWidget(Button.builder(Component.literal("▲ " + pg),
 				b -> {
 					listPage = Math.max(0, listPage - 1);
@@ -123,23 +116,23 @@ public class WidgetEditorScreen extends Screen {
 		int px = panelX();
 		int pw = panelW();
 		int by = contentTop();
-		by = addFull(px, by, pw, "+ Timer", () -> add(WidgetType.TIMER, "Timer: {value}"));
-		by = addFull(px, by, pw, "+ StepCount", () -> add(WidgetType.STEPCOUNT, "Steps: {value}"));
-		by = addFull(px, by, pw, "+ Uhr", () -> add(WidgetType.CLOCK, "{value}"));
-		by = addFull(px, by, pw, "+ Text", () -> add(WidgetType.TEXT, "FlexHUD"));
-		by = addFull(px, by, pw, "+ FPS", () -> add(WidgetType.FPS, "FPS: {value}"));
-		by = addFull(px, by, pw, "An/Aus", this::toggleSelected);
-		by = addFull(px, by, pw, "Stil…", () -> {
+		by = addFull(px, by, pw, Lang.t("editor.add_timer"), () -> add(WidgetType.TIMER, "Timer: {value}"));
+		by = addFull(px, by, pw, Lang.t("editor.add_steps"), () -> add(WidgetType.STEPCOUNT, "Steps: {value}"));
+		by = addFull(px, by, pw, Lang.t("editor.add_clock"), () -> add(WidgetType.CLOCK, "{value}"));
+		by = addFull(px, by, pw, Lang.t("editor.add_text"), () -> add(WidgetType.TEXT, "FlexHUD"));
+		by = addFull(px, by, pw, Lang.t("editor.add_fps"), () -> add(WidgetType.FPS, "FPS: {value}"));
+		by = addFull(px, by, pw, Lang.t("editor.toggle"), this::toggleSelected);
+		by = addFull(px, by, pw, Lang.t("editor.style"), () -> {
 			if (selectedId != null) {
 				switchTo(new StyleEditScreen(this, selectedId));
 			}
 		});
-		by = addFull(px, by, pw, "Löschen", this::deleteSelected);
+		by = addFull(px, by, pw, Lang.t("editor.delete"), this::deleteSelected);
 		// Scale nebeneinander
 		if (by + 20 <= prevY - 4) {
-			addRenderableWidget(Button.builder(Component.literal("Scale -"),
+			addRenderableWidget(Button.builder(Component.literal(Lang.t("editor.scale_down")),
 				b -> scaleSelected(0.9f)).bounds(px, by, pw / 2 - 1, 20).build());
-			addRenderableWidget(Button.builder(Component.literal("Scale +"),
+			addRenderableWidget(Button.builder(Component.literal(Lang.t("editor.scale_up")),
 				b -> scaleSelected(1.1f)).bounds(px + pw / 2 + 1, by, pw - pw / 2 - 1, 20).build());
 			by += 22;
 		}
@@ -157,27 +150,26 @@ public class WidgetEditorScreen extends Screen {
 			}
 		}
 
-		addRenderableWidget(Button.builder(Component.literal("Zurück"),
+		addRenderableWidget(Button.builder(Component.literal(Lang.t("back")),
 			b -> onClose()).bounds(10, this.height - footerH() + 2, 100, 20).build());
 
-		// Aktions-Leiste für die Auswahl: erscheint sobald ein Widget gewählt ist.
-		// Fix in der Footer-Zeile platziert -> immer sichtbar (auch auf kleinen Fenstern).
+		// Aktions-Leiste: erscheint bei Auswahl, fix in der Footer-Zeile.
 		WidgetConfig sel = selected();
 		if (sel != null) {
 			int ax = 120;
 			int abw = Math.max(50, (this.width - ax - 10 - 2 * 4) / 3);
 			int ay = this.height - footerH() + 2;
-			String toggleLabel = sel.enabled ? "Ausschalten" : "Einschalten";
+			String toggleLabel = Lang.t(sel.enabled ? "editor.disable" : "editor.enable");
 			addRenderableWidget(Button.builder(Component.literal(toggleLabel),
 				b -> toggleSelected()).bounds(ax, ay, abw, 20).build());
-			addRenderableWidget(Button.builder(Component.literal("Stil…"),
+			addRenderableWidget(Button.builder(Component.literal(Lang.t("editor.style")),
 				b -> {
 					if (selectedId != null) {
 						switchTo(new StyleEditScreen(this, selectedId));
 					}
 				}).bounds(ax + abw + 4, ay, abw, 20).build());
 			boolean confirm = sel.id.equals(pendingDelete);
-			addRenderableWidget(Button.builder(Component.literal(confirm ? "Sicher löschen?" : "Löschen"),
+			addRenderableWidget(Button.builder(Component.literal(confirm ? Lang.t("editor.confirm_delete") : Lang.t("editor.delete")),
 				b -> {
 					WidgetConfig s = selected();
 					if (s == null) {
@@ -214,34 +206,30 @@ public class WidgetEditorScreen extends Screen {
 			return;
 		}
 
-		graphics.centeredText(this.font, "FlexHUD – Widget-Editor", this.width / 2, 8, 0xFFFFFF);
-		graphics.centeredText(this.font, "Liste: wählen · Vorschau: packen + ziehen · Pfeiltasten: Auswahl bewegen",
+		graphics.centeredText(this.font, Lang.t("editor.title"), this.width / 2, 8, 0xFFFFFF);
+		graphics.centeredText(this.font, Lang.t("editor.hint"),
 			this.width / 2, 20, 0xAAAAAA);
 
-		// Detail-Infos zum gewählten Widget in der Mitte
-		WidgetConfig sel = selected();
+			WidgetConfig sel = selected();
 		int infoX = listW() + 20;
 		int infoW = panelX() - infoX - 10;
 		if (sel != null && infoW > 60) {
 			int iy = contentTop() + 2;
-			graphics.text(this.font, "Auswahl: " + sel.id, infoX, iy, 0x55FFFF);
-			graphics.text(this.font, "Typ: " + sel.type.displayName()
-				+ (sel.enabled ? " (AN)" : " (AUS)"), infoX, iy + 12, 0xCCCCCC);
-			graphics.text(this.font, String.format("Pos: %d%% / %d%%   Scale: %.1f",
-				Math.round(sel.x * 100), Math.round(sel.y * 100), sel.style.scale),
+			graphics.text(this.font, Lang.f("editor.sel", sel.id), infoX, iy, 0x55FFFF);
+			graphics.text(this.font, Lang.f("editor.type", sel.type.displayName(), Lang.t(sel.enabled ? "on" : "off")), infoX, iy + 12, 0xCCCCCC);
+			graphics.text(this.font, Lang.f("editor.pos",
+				Math.round(sel.x * 100), Math.round(sel.y * 100), String.format(java.util.Locale.ROOT, "%.1f", sel.style.scale)),
 				infoX, iy + 24, 0xCCCCCC);
-			graphics.text(this.font, "Stil: " + sel.style.animation.displayName()
-				+ " · " + sel.style.cycleMs + "ms"
-				+ (sel.style.bold ? " · fett" : "")
-				+ (sel.style.hideText ? " · ohne Text" : ""), infoX, iy + 36, 0xCCCCCC);
+			graphics.text(this.font, Lang.f("editor.styleline", sel.style.animation.displayName(),
+				sel.style.cycleMs, sel.style.bold ? Lang.t("editor.boldflag") : "",
+				sel.style.hideText ? Lang.t("editor.notextflag") : ""), infoX, iy + 36, 0xCCCCCC);
 			String tpl = sel.template.length() > 30 ? sel.template.substring(0, 30) + "…" : sel.template;
-			graphics.text(this.font, "Vorlage: " + tpl, infoX, iy + 48, 0x888888);
+			graphics.text(this.font, Lang.f("editor.template", tpl), infoX, iy + 48, 0x888888);
 		}
 
-		// Vorschau-Rahmen
 		graphics.fill(prevX, prevY, prevX + prevW, prevY + prevH, 0x60000000);
 		graphics.outline(prevX, prevY, prevX + prevW, prevY + prevH, 0xFF55FFFF);
-		graphics.text(this.font, "Live-Vorschau (echter Stil, echte Animation)",
+		graphics.text(this.font, Lang.t("editor.preview"),
 			prevX + 6, prevY + 4, 0xAAAAAA);
 
 		long now = Util.getMillis();
@@ -251,7 +239,7 @@ public class WidgetEditorScreen extends Screen {
 			boolean isSel = w.id.equals(selectedId);
 			String plain = WidgetHud.previewText(w);
 			if (!w.enabled) {
-				plain = "[aus] " + plain;
+				plain = Lang.t("editor.disabled_prefix") + plain;
 			}
 			MutableComponent text = GradientUtil.style(plain, w.style, now);
 			int textWidth = client.font.width(text.getVisualOrderText());

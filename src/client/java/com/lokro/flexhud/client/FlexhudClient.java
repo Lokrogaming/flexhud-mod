@@ -6,6 +6,7 @@ import com.lokro.flexhud.client.config.FlexhudConfig;
 import com.lokro.flexhud.client.hud.WidgetHud;
 import com.lokro.flexhud.client.key.FlexhudKeys;
 import com.lokro.flexhud.client.market.MarketplaceCache;
+import com.lokro.flexhud.client.market.UpdateChecker;
 import com.lokro.flexhud.client.state.TimerState;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -13,10 +14,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 
-/**
- * Client-Entrypoint: Config laden, HUD-Element, Ticks, Keybind, Commands.
- * Alles client-side – läuft auch auf Servern ohne Server-Mod.
- */
+/** Client-Entrypoint (alles client-side). */
 public class FlexhudClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
@@ -30,8 +28,11 @@ public class FlexhudClient implements ClientModInitializer {
 			FlexhudKeys.tick(client);
 		});
 
-		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) ->
-			MarketplaceCache.refreshAsyncIfStale());
+		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+		MarketplaceCache.refreshAsyncIfStale();
+		UpdateChecker.refreshAsync(null);
+			UpdateChecker.notifyOnJoin();
+		});
 
 		HudElementRegistry.attachElementBefore(
 			VanillaHudElements.CHAT,
@@ -39,7 +40,6 @@ public class FlexhudClient implements ClientModInitializer {
 			(graphics, deltaTracker) -> WidgetHud.render(graphics)
 		);
 
-		// Marketplace-JSON beim Start im Hintergrund laden (nicht blockieren).
 		MarketplaceCache.refreshAsyncIfStale();
 
 		FlexhudMod.LOGGER.info("[FlexHUD] Client initialisiert: Hotkey H, /flexhud, /timer. Widgets: {}",

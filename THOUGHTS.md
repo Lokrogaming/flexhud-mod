@@ -102,7 +102,6 @@ fertige Kärtchen-Sets – und es warnt, wenn ein Kärtchen mit einer anderen Mo
 doppelt hängt.
 
 ## 7. Editor-Rework (09.10.2026, nach In-Game-Screenshot)
-
 - Problem: fixe Pixel-Positionen liefen auf schmalen Fenstern rechts aus dem Bild.
 - Fix: `WidgetEditorScreen` komplett responsiv (Listen-/Panel-Breiten aus `width`,
   Buttons lassen Plätze aus statt zu überlappen, Paging bei vielen Widgets),
@@ -110,3 +109,20 @@ doppelt hängt.
   (GradientUtil + `Util.getMillis()`), Klick-wählt-nächstes-Widget + Drag.
 - Layout-Regel für neue Screens: NIE fixe X-Positionen rechts von `width/2`
   annehmen – immer aus `this.width/height` rechnen (vgl. Screenshot-Bug).
+
+## 8. Feature-Batch (09.10.2026, User-Wunschliste)
+
+- Timer: ms-Toggle (persistiert), Tage im Format, `{d/h/m/s/ms}`-Platzhalter.
+- `.flexconfig` pro Pack (Meta + configMenu + widgetButtons, Icons reserviert).
+  Design-Entscheid: Buttons wirken nur auf Widget-Stile (toggle/set/preset/message),
+  kein freier Code – sicher + wartbar. Overview nur bei deklariertem configMenu.
+- Update-Flow: Start-Check aller Links (Temp-Zips, danach gelöscht), Join-Message
+  mit Klick → UpdateScreen (einzeln/alle). Layout-Save positionsweise; bei
+  Strukturänderung alte Felder weg + Warnung (so gewünscht).
+- Pack-gegen-Pack-Konflikt via modId aus installed.json (Paket-Namen-Tracking).
+- i18n: `Lang` mit DE/EN, Spiel-Sprache via `options.languageCode`. Neue Strings
+  IMMER in beiden Maps – sonst Fallback-Key sichtbar.
+- Kommentare: zählen NICHT in die Jar-Größe (javac strippt sie), nur Sources.
+  Trotzdem getrimmt, Kritisches (Security/API/Formate) bleibt.
+- description.md ist TEMPORÄR für Agenten/AIs – bei Reife in AGENTS.md einpflegen
+  und löschen.

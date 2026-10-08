@@ -1,5 +1,7 @@
 package com.lokro.flexhud.client.config;
 
+import com.lokro.flexhud.client.i18n.Lang;
+
 /** Animations-Modi für Gradienten. */
 public enum AnimationMode {
 	OFF,
@@ -10,11 +12,11 @@ public enum AnimationMode {
 
 	public String displayName() {
 		return switch (this) {
-			case OFF -> "Aus (statisch)";
-			case SCROLL_L -> "Scroll links";
-			case SCROLL_R -> "Scroll rechts";
-			case PULSE -> "Pulsieren";
-			case RAINBOW -> "Regenbogen";
+			case OFF -> Lang.t("anim.off");
+			case SCROLL_L -> Lang.t("anim.scroll_l");
+			case SCROLL_R -> Lang.t("anim.scroll_r");
+			case PULSE -> Lang.t("anim.pulse");
+			case RAINBOW -> Lang.t("anim.rainbow");
 		};
 	}
 

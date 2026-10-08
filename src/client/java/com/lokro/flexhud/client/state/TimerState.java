@@ -10,10 +10,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * Stoppuhr-Status (Timer-Widget). Wird in {@code config/flexhud-timer.json}
- * gespeichert, damit ein laufender Timer einen Neustart überlebt.
- */
+/** Stoppuhr (Timer-Widget), gespeichert in config/flexhud-timer.json. */
 public final class TimerState {
 	private TimerState() {}
 
@@ -23,11 +20,13 @@ public final class TimerState {
 	private static long accumulatedMs = 0L;
 	private static long lastTickMs = 0L;
 	private static boolean showHud = true;
+	private static boolean showMillis = true;
 
 	private static class Data {
 		boolean running;
 		long accumulatedMs;
 		boolean showHud = true;
+		boolean showMillis = true;
 	}
 
 	private static Path file() {
@@ -42,8 +41,8 @@ public final class TimerState {
 				if (d != null) {
 					accumulatedMs = Math.max(0, d.accumulatedMs);
 					showHud = d.showHud;
-					// Timer läuft nach Reload pausiert weiter (kein Zeit-Cheat durch Abwesenheit).
-					running = false;
+					showMillis = d.showMillis;
+					running = false; // nach Reload pausiert (kein Zeit-Cheat durch Abwesenheit)
 				}
 			} catch (Exception e) {
 				FlexhudMod.LOGGER.warn("[FlexHUD] Timer-Status konnte nicht gelesen werden.", e);
@@ -59,6 +58,7 @@ public final class TimerState {
 			d.running = running;
 			d.accumulatedMs = accumulatedMs;
 			d.showHud = showHud;
+			d.showMillis = showMillis;
 			try (Writer w = Files.newBufferedWriter(file())) {
 				GSON.toJson(d, w);
 			}
@@ -122,15 +122,53 @@ public final class TimerState {
 		return showHud;
 	}
 
-	/** Format M:SS oder H:MM:SS, optional mit Zehntel. */
-	public static String format(long ms, boolean withTenths) {
+	public static synchronized boolean toggleShowMillis() {
+		showMillis = !showMillis;
+		save();
+		return showMillis;
+	}
+
+	public static synchronized boolean shouldShowMillis() {
+		return showMillis;
+	}
+
+	/**
+	 * Rendert eine Timer-Vorlage. Ersetzt {value} (Format nach ms-Einstellung)
+	 * plus Einzel-Platzhalter: {d} Tage, {h} Stunden, {m} Minuten, {s} Sekunden,
+	 * {ms} Millisekunden (je 2-/3-stellig, außer {d}).
+	 */
+	public static String render(String template, long ms) {
+		String tpl = (template == null || template.isEmpty()) ? "{value}" : template;
 		long totalSec = ms / 1000;
-		long h = totalSec / 3600;
+		long d = totalSec / 86400;
+		long h = (totalSec % 86400) / 3600;
 		long m = (totalSec % 3600) / 60;
 		long s = totalSec % 60;
-		String base = h > 0
-			? String.format("%d:%02d:%02d", h, m, s)
-			: String.format("%02d:%02d", m, s);
+		long milli = ms % 1000;
+		String out = tpl
+			.replace("{d}", String.valueOf(d))
+			.replace("{h}", String.format("%02d", h))
+			.replace("{m}", String.format("%02d", m))
+			.replace("{s}", String.format("%02d", s))
+			.replace("{ms}", String.format("%03d", milli));
+		return out.replace("{value}", format(ms, showMillis));
+	}
+
+	/** Format wächst automatisch: M:SS, H:MM:SS, Dh H:MM:SS, optional Zehntel. */
+	public static String format(long ms, boolean withTenths) {
+		long totalSec = ms / 1000;
+		long d = totalSec / 86400;
+		long h = (totalSec % 86400) / 3600;
+		long m = (totalSec % 3600) / 60;
+		long s = totalSec % 60;
+		String base;
+		if (d > 0) {
+			base = String.format("%dd %02d:%02d:%02d", d, h, m, s);
+		} else if (h > 0) {
+			base = String.format("%d:%02d:%02d", h, m, s);
+		} else {
+			base = String.format("%02d:%02d", m, s);
+		}
 		if (withTenths) {
 			base += "." + ((ms % 1000) / 100);
 		}

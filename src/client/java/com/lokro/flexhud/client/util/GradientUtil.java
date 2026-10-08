@@ -10,11 +10,7 @@ import net.minecraft.network.chat.TextColor;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Erzeugt pro Frame stylisierte Texte: statisch oder animierter Gradient
- * (Scroll links/rechts, Puls, Regenbogen). Basis-Idee aus der StepCount-Mod,
- * hier generalisiert + customizbar (Farben, Dauer, Fett/Kursiv).
- */
+/** Stilisierte Texte: statisch oder animierter Gradient (customizbar). */
 public final class GradientUtil {
 	private GradientUtil() {}
 

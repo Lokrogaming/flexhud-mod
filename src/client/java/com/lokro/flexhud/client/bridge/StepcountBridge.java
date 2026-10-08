@@ -66,32 +66,34 @@ public final class StepcountBridge {
 		try {
 			Class<?> cls = stepCounterClass();
 			if (cls == null) {
-				return "StepCount-Mod ist nicht installiert (Mod-Datei fehlt).";
+				return com.lokro.flexhud.client.i18n.Lang.t("bridge.missing");
 			}
 			switch (action.toLowerCase()) {
 				case "start" -> {
 					cls.getMethod("start").invoke(null);
-					return "StepCount gestartet.";
+					return com.lokro.flexhud.client.i18n.Lang.t("bridge.started");
 				}
 				case "stop" -> {
 					cls.getMethod("stop").invoke(null);
-					return "StepCount gestoppt.";
+					return com.lokro.flexhud.client.i18n.Lang.t("bridge.stopped");
 				}
 				case "reset" -> {
 					cls.getMethod("reset").invoke(null);
-					return "StepCount zurückgesetzt.";
+					return com.lokro.flexhud.client.i18n.Lang.t("bridge.reset");
 				}
 				case "show" -> {
 					Object v = cls.getMethod("toggleShow").invoke(null);
-					return Boolean.TRUE.equals(v) ? "StepCount-Anzeige EIN." : "StepCount-Anzeige AUS.";
+					return Boolean.TRUE.equals(v)
+						? com.lokro.flexhud.client.i18n.Lang.t("bridge.shown")
+						: com.lokro.flexhud.client.i18n.Lang.t("bridge.hidden");
 				}
 				default -> {
-					return "Unbekannt. Nutze start/stop/reset/show.";
+					return com.lokro.flexhud.client.i18n.Lang.t("bridge.unknown");
 				}
 			}
 		} catch (Throwable t) {
 			FlexhudMod.LOGGER.warn("[FlexHUD] StepCount-Befehl '{}' fehlgeschlagen.", action, t);
-			return "Fehler beim Steuern von StepCount (API geändert?).";
+			return com.lokro.flexhud.client.i18n.Lang.t("bridge.error");
 		}
 	}
 

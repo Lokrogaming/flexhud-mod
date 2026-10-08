@@ -15,11 +15,7 @@ import net.minecraft.util.Util;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Rendert ALLE aktivierten FlexHUD-Widgets als ein HUD-Element.
- * Jedes Widget ist frei positionierbar (x/y relativ), skalierbar und
- * per Gradient/Animation customizbar – im Gegensatz zum fixen StepCount-HUD.
- */
+/** Rendert alle aktivierten Widgets als ein HUD-Element. */
 public final class WidgetHud {
 	private WidgetHud() {}
 
@@ -54,14 +50,17 @@ public final class WidgetHud {
 		}
 	}
 
-	/** Vorschau-Text für den Editor (ohne Spielwelt nutzbar). */
+	/** Vorschau-Text für den Editor. */
 	public static String previewText(WidgetConfig w) {
 		if (w.type == WidgetType.TEXT) {
 			return w.style.hideText ? "" : w.template;
 		}
+		if (w.type == WidgetType.TIMER) {
+			return TimerState.render(w.template, 754000L);
+		}
 		String tpl = w.style.hideText ? "{value}" : w.template;
 		return switch (w.type) {
-			case TIMER -> applyTemplate(tpl, TimerState.format(754000L, true));
+			case TIMER -> tpl;
 			case STEPCOUNT -> applyTemplate(tpl, "1234");
 			case CLOCK -> applyTemplate(tpl, "21:37:00");
 			case TEXT -> tpl;
@@ -73,14 +72,15 @@ public final class WidgetHud {
 		if (w.type == WidgetType.TEXT) {
 			return w.style.hideText ? "" : w.template;
 		}
+		if (w.type == WidgetType.TIMER) {
+			if (!TimerState.shouldShowHud()) {
+				return null;
+			}
+			return TimerState.render(w.template, TimerState.getElapsedMs());
+		}
 		String tpl = w.style.hideText ? "{value}" : w.template;
 		return switch (w.type) {
-			case TIMER -> {
-				if (!TimerState.shouldShowHud()) {
-					yield null;
-				}
-				yield applyTemplate(tpl, TimerState.format(TimerState.getElapsedMs(), true));
-			}
+			case TIMER -> tpl;
 			case STEPCOUNT -> {
 				if (!StepcountBridge.installed()) {
 					yield applyTemplate(tpl, "n/a (StepCount fehlt)");
