@@ -1,0 +1,23 @@
+{
+  "_comment": "FlexConfig des PvP-Packs (reines Widget-Pack, keine fremde Mod nötig).",
+  "packId": "pvp-pack",
+  "packName": "PvP-Pack",
+  "author": "Lokro",
+  "website": "https://github.com/Lokrogaming/flexhud-mod",
+  "created": "2026-10-09",
+  "updated": "2026-10-09",
+  "version": "1.0.0",
+  "description": "CPS, Reach, Ping, Rüstung, Tasten und Effekte für PvP.",
+  "icons": {},
+  "configMenu": {
+    "enabled": true,
+    "title": "PvP",
+    "buttons": [
+      {"id": "candy", "label": "Candy für alle", "action": "applyPreset", "target": "style", "value": "Candy"},
+      {"id": "static", "label": "Animation aus", "action": "setStyle", "target": "style", "field": "animation", "value": "OFF"}
+    ]
+  },
+  "widgetButtons": [
+    {"id": "big", "label": "Groß (Scale 1.5)", "action": "setStyle", "target": "style", "field": "scale", "value": "1.5"}
+  ]
+}

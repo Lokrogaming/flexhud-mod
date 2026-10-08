@@ -126,3 +126,23 @@ doppelt hängt.
   Trotzdem getrimmt, Kritisches (Security/API/Formate) bleibt.
 - description.md ist TEMPORÄR für Agenten/AIs – bei Reife in AGENTS.md einpflegen
   und löschen.
+
+## 9. Widget-Ideen sortiert (09.10.2026, User-Sammlung)
+
+- **JETZT drin (31 Typen)**: Timer, StepCount-Bridge, Uhr, Text, FPS, Rüstung,
+  CPS, Koordinaten, Biom, Nether-Koords, Kompass, Neigung, Tag, Ping, Server,
+  Speicher, Tempo, Spielzeit, Weltzeit, Item in Hand, Licht, Distanz, Effekte,
+  Wetter, Inventar-voll, Tasten, Sprint, Entities, Reichweite, TPS, TNT.
+  Umsetzung: ein `WidgetType` + Provider in `WidgetValues` (defensiv, nie Crash).
+  Neue Typen brauchen nur: Enum-Eintrag, `Lang`-Keys (`type.*`), Provider-Case.
+- **Nächstes Update (mittel, Render-Hooks nötig)**: Resource-Pack-Anzeige,
+  Schild-Leser (Block-Entity am Fadenkreuz), Boss-Bar verschieben/toggeln,
+  Scoreboard verschieben, Titel/Untertitel-Stil, Crosshair-Stil, Inventar-Anzeige.
+- **Später (komplex)**: pro-Widget-Config (z. B. Entity-Radius), Keystrokes mit
+  CPS-Graph, Outline-Presets.
+- **NICHT client-seitig möglich**: Wetter-Wechsler, Zeit-Wechsler (brauchen
+  Cheats/Server-Rechte – kein reiner Client-Feature).
+- **Editor-Regel**: neue Typen erscheinen automatisch einzeln oben im
+  Typ-Grid (scrollbar) – kein Picker-Dialog (User-Wunsch: alles direkt sichtbar).
+- **Drag-Bugfix**: `setDragging(true/false)` im Editor war Pflicht – ohne
+  liefert Vanilla keine `mouseDragged`-Events (Dispatch prüft `isDragging`).

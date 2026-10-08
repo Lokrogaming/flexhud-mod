@@ -22,8 +22,11 @@ The mod runs **fully client-side** – including on servers without a server-sid
   (`/flexhud timer ms`), format auto-expands (M:SS → H:MM:SS → dD H:MM:SS).
   Templates with `{value}` or individual parts: `{d}` days, `{h}` hours,
   `{m}` minutes, `{s}` seconds, `{ms}` milliseconds.
-- **Widget system**: TIMER, STEPCOUNT bridge, CLOCK, TEXT, FPS – add, delete,
-  enable/disable, **position freely** (relative, resolution-independent).
+- **Widget system**: TIMER, STEPCOUNT bridge, CLOCK, TEXT, FPS, armor, CPS,
+  coordinates, biome, Nether coords, compass, pitch, day, ping, server, memory,
+  speed, playtime, world time, held item, light, distance, potion effects,
+  weather, full-inventory warning, keystrokes, sprint, entity count, reach,
+  TPS, TNT – add, delete, enable/disable, **position freely**.
 - **Per-widget style**: gradient presets (StepCount Classic, Ocean, Sunset,
   Candy, Gold), animations (scroll left/right, pulse, rainbow, static),
   duration, bold/italic, shadow, background + opacity, scaling,
@@ -171,8 +174,11 @@ Die Mod läuft **komplett client-seitig** – auch auf Servern ohne Server-Mod.
   (`/flexhud timer ms`) an-/abschaltbar, Format wächst automatisch
   (M:SS → H:MM:SS → dD H:MM:SS). Vorlagen mit `{value}` oder einzeln:
   `{d}` Tage, `{h}` Stunden, `{m}` Minuten, `{s}` Sekunden, `{ms}` Millisekunden.
-- **Widget-System**: TIMER, STEPCOUNT-Bridge, UHR, TEXT, FPS – hinzufügen, löschen,
-  an/ausschalten, **frei positionieren** (relativ, also auflösungsunabhängig).
+- **Widget-System**: TIMER, STEPCOUNT-Bridge, UHR, TEXT, FPS, Rüstung, CPS,
+  Koordinaten, Biom, Nether-Koords, Kompass, Neigung, Tag, Ping, Server, Speicher,
+  Tempo, Spielzeit, Weltzeit, Item in Hand, Licht, Distanz, Effekte, Wetter,
+  Inventar-voll-Warnung, Tasten, Sprint, Entities, Reichweite, TPS, TNT –
+  hinzufügen, löschen, an/ausschalten, **frei positionieren**.
 - **Style pro Widget**: Gradient-Presets (u. a. StepCount-Classic, Ocean, Sunset,
   Candy, Gold), Animationen (Scroll links/rechts, Puls, Regenbogen, statisch),
   Dauer, Fett/Kursiv, Schatten, Hintergrund + Deckkraft, Skalierung,

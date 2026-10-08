@@ -59,13 +59,15 @@ public final class WidgetHud {
 			return TimerState.render(w.template, 754000L);
 		}
 		String tpl = w.style.hideText ? "{value}" : w.template;
-		return switch (w.type) {
+		String sample = switch (w.type) {
 			case TIMER -> tpl;
-			case STEPCOUNT -> applyTemplate(tpl, "1234");
-			case CLOCK -> applyTemplate(tpl, "21:37:00");
+			case STEPCOUNT -> "1234";
+			case CLOCK -> "21:37:00";
 			case TEXT -> tpl;
-			case FPS -> applyTemplate(tpl, "120");
+			case FPS -> "120";
+			default -> WidgetValues.previewFor(w.type);
 		};
+		return applyTemplate(tpl, sample);
 	}
 
 	static String textFor(WidgetConfig w, Minecraft client) {
@@ -90,6 +92,10 @@ public final class WidgetHud {
 			case CLOCK -> applyTemplate(tpl, LocalTime.now().format(CLOCK));
 			case TEXT -> tpl;
 			case FPS -> applyTemplate(tpl, String.valueOf(client.getFps()));
+			default -> {
+				String v = WidgetValues.valueFor(w.type, client);
+				yield v == null ? null : applyTemplate(tpl, v);
+			}
 		};
 	}
 

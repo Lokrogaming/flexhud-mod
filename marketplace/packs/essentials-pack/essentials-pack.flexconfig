@@ -1,0 +1,23 @@
+{
+  "_comment": "FlexConfig des Essentials-Packs (reines Widget-Pack, keine fremde Mod nötig).",
+  "packId": "essentials-pack",
+  "packName": "Essentials-Pack",
+  "author": "Lokro",
+  "website": "https://github.com/Lokrogaming/flexhud-mod",
+  "created": "2026-10-09",
+  "updated": "2026-10-09",
+  "version": "1.0.0",
+  "description": "Uhr, FPS, Koordinaten und Tag als frei platzierbare Widgets.",
+  "icons": {},
+  "configMenu": {
+    "enabled": true,
+    "title": "Essentials",
+    "buttons": [
+      {"id": "ocean", "label": "Ocean für alle", "action": "applyPreset", "target": "style", "value": "Ocean"},
+      {"id": "bg", "label": "Hintergrund umschalten", "action": "toggleStyle", "target": "style", "field": "background"}
+    ]
+  },
+  "widgetButtons": [
+    {"id": "static", "label": "Statisch weiß", "action": "setStyle", "target": "style", "field": "animation", "value": "OFF"}
+  ]
+}

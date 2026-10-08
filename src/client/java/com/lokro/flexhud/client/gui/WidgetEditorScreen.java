@@ -22,6 +22,8 @@ public class WidgetEditorScreen extends Screen {
 	private boolean dragging = false;
 	private int listPage = 0;
 	private String pendingDelete = null;
+	private boolean fullscreen = false;
+	private int addScroll = 0;
 
 	// Vorschau-Rechteck (wird in init()/extractRenderState identisch berechnet)
 	private int prevX, prevY, prevW, prevH;
@@ -58,6 +60,13 @@ public class WidgetEditorScreen extends Screen {
 	}
 
 	private void computePreview() {
+		if (fullscreen) {
+			prevX = 0;
+			prevY = 0;
+			prevW = this.width;
+			prevH = this.height - footerH() - 6;
+			return;
+		}
 		prevH = Math.max(80, Math.min(130, this.height / 4));
 		prevW = this.width - 20;
 		prevX = 10;
@@ -76,6 +85,7 @@ public class WidgetEditorScreen extends Screen {
 		computePreview();
 		FlexhudConfig cfg = FlexhudConfig.get();
 
+		if (!fullscreen) {
 		// Linke Liste (mit Paging bei Überlauf)
 		int lw = listW();
 		int ps = pageSize();
@@ -112,15 +122,33 @@ public class WidgetEditorScreen extends Screen {
 				}).bounds(10 + lw / 2 + 1, y, lw - lw / 2 - 1, 18).build());
 		}
 
-		// Rechtes Aktions-Panel (volle Breite, kein Überlauf möglich)
+		// Typ-Grid oben: alle Widget-Typen einzeln (scrollbar). Darunter Fix-Buttons.
 		int px = panelX();
 		int pw = panelW();
 		int by = contentTop();
-		by = addFull(px, by, pw, Lang.t("editor.add_timer"), () -> add(WidgetType.TIMER, "Timer: {value}"));
-		by = addFull(px, by, pw, Lang.t("editor.add_steps"), () -> add(WidgetType.STEPCOUNT, "Steps: {value}"));
-		by = addFull(px, by, pw, Lang.t("editor.add_clock"), () -> add(WidgetType.CLOCK, "{value}"));
-		by = addFull(px, by, pw, Lang.t("editor.add_text"), () -> add(WidgetType.TEXT, "FlexHUD"));
-		by = addFull(px, by, pw, Lang.t("editor.add_fps"), () -> add(WidgetType.FPS, "FPS: {value}"));
+		WidgetType[] allTypes = WidgetType.values();
+		int cols = 2;
+		int gw = (pw - 4) / cols;
+		int gridTop = by + 12;
+		int mgmtH = 6 * 22;
+		int gridBottom = prevY - 4 - mgmtH - 4;
+		int typeRows = (allTypes.length + cols - 1) / cols;
+		int maxAdd = Math.max(0, typeRows * 20 - (gridBottom - gridTop));
+		addScroll = Math.max(0, Math.min(addScroll, maxAdd));
+		for (int i = 0; i < allTypes.length; i++) {
+			int gy = gridTop + (i / cols) * 20 - addScroll;
+			if (gy + 20 < gridTop || gy > gridBottom - 20) {
+				continue;
+			}
+			WidgetType ref = allTypes[i];
+			addRenderableWidget(Button.builder(Component.literal("+ " + ref.displayName()),
+				b -> createAndSelect(ref)).bounds(px + (i % cols) * (gw + 4), gy, gw, 20).build());
+		}
+		by = gridBottom + 4;
+		by = addFull(px, by, pw, Lang.f("editor.fullscreen", Lang.t(fullscreen ? "off" : "on")), () -> {
+			fullscreen = !fullscreen;
+			rebuildWidgets();
+		});
 		by = addFull(px, by, pw, Lang.t("editor.toggle"), this::toggleSelected);
 		by = addFull(px, by, pw, Lang.t("editor.style"), () -> {
 			if (selectedId != null) {
@@ -148,6 +176,15 @@ public class WidgetEditorScreen extends Screen {
 				addRenderableWidget(Button.builder(Component.literal(arrows[i]),
 					b -> nudge(ddx, ddy)).bounds(px + i * (aw + 2), by, aw, 20).build());
 			}
+		}
+		}
+
+		if (fullscreen) {
+			addRenderableWidget(Button.builder(Component.literal(Lang.f("editor.fullscreen", Lang.t("off"))),
+				b -> {
+					fullscreen = false;
+					rebuildWidgets();
+				}).bounds(this.width - 140, 10, 130, 20).build());
 		}
 
 		addRenderableWidget(Button.builder(Component.literal(Lang.t("back")),
@@ -206,14 +243,18 @@ public class WidgetEditorScreen extends Screen {
 			return;
 		}
 
-		graphics.centeredText(this.font, Lang.t("editor.title"), this.width / 2, 8, 0xFFFFFF);
-		graphics.centeredText(this.font, Lang.t("editor.hint"),
-			this.width / 2, 20, 0xAAAAAA);
+		if (fullscreen) {
+			graphics.centeredText(this.font, Lang.t("editor.full_hint"), this.width / 2, 10, 0xAAAAAA);
+		} else {
+			graphics.centeredText(this.font, Lang.t("editor.title"), this.width / 2, 8, 0xFFFFFF);
+			graphics.centeredText(this.font, Lang.t("editor.hint"),
+				this.width / 2, 20, 0xAAAAAA);
+		}
 
 			WidgetConfig sel = selected();
 		int infoX = listW() + 20;
 		int infoW = panelX() - infoX - 10;
-		if (sel != null && infoW > 60) {
+		if (sel != null && infoW > 60 && !fullscreen) {
 			int iy = contentTop() + 2;
 			graphics.text(this.font, Lang.f("editor.sel", sel.id), infoX, iy, 0x55FFFF);
 			graphics.text(this.font, Lang.f("editor.type", sel.type.displayName(), Lang.t(sel.enabled ? "on" : "off")), infoX, iy + 12, 0xCCCCCC);
@@ -227,15 +268,19 @@ public class WidgetEditorScreen extends Screen {
 			graphics.text(this.font, Lang.f("editor.template", tpl), infoX, iy + 48, 0x888888);
 		}
 
-		graphics.fill(prevX, prevY, prevX + prevW, prevY + prevH, 0x60000000);
-		graphics.outline(prevX, prevY, prevX + prevW, prevY + prevH, 0xFF55FFFF);
-		graphics.text(this.font, Lang.t("editor.preview"),
-			prevX + 6, prevY + 4, 0xAAAAAA);
+		if (!fullscreen) {
+			graphics.fill(prevX, prevY, prevX + prevW, prevY + prevH, 0x60000000);
+			graphics.outline(prevX, prevY, prevX + prevW, prevY + prevH, 0xFF55FFFF);
+			graphics.text(this.font, Lang.t("editor.preview"),
+				prevX + 6, prevY + 4, 0xAAAAAA);
+			graphics.text(this.font, Lang.t("editor.add_title"), panelX(), contentTop(), 0xAAAAAA);
+		}
 
 		long now = Util.getMillis();
 		for (WidgetConfig w : FlexhudConfig.get().widgets) {
-			int cx = prevX + Math.round(w.x * prevW);
-			int cy = prevY + 16 + Math.round(w.y * (prevH - 30));
+			int cx = fullscreen ? Math.round(w.x * this.width) : prevX + Math.round(w.x * prevW);
+			int cy = fullscreen ? Math.round(w.y * this.height)
+				: prevY + 16 + Math.round(w.y * (prevH - 30));
 			boolean isSel = w.id.equals(selectedId);
 			String plain = WidgetHud.previewText(w);
 			if (!w.enabled) {
@@ -243,7 +288,8 @@ public class WidgetEditorScreen extends Screen {
 			}
 			MutableComponent text = GradientUtil.style(plain, w.style, now);
 			int textWidth = client.font.width(text.getVisualOrderText());
-			float scale = Math.max(0.5f, Math.min(1.0f, prevW / 500f));
+			float scale = fullscreen ? w.style.scale
+				: Math.max(0.5f, Math.min(1.0f, prevW / 500f));
 
 			if (isSel) {
 				int pad = 3;
@@ -265,12 +311,14 @@ public class WidgetEditorScreen extends Screen {
 		computePreview();
 		if (event.button() == 0 && inside(event.x(), event.y())) {
 			WidgetConfig nearest = nearestWidget(event.x(), event.y());
-			if (nearest != null) {
+			if (nearest != null && (!fullscreen
+				|| Math.hypot(event.x() - widgetPx(nearest), event.y() - widgetPy(nearest)) < 24)) {
 				if (!nearest.id.equals(selectedId)) {
 					pendingDelete = null;
 				}
 				selectedId = nearest.id;
 				dragging = true;
+				setDragging(true);
 				moveTo(nearest, event.x(), event.y());
 				rebuildWidgets();
 				return true;
@@ -296,10 +344,36 @@ public class WidgetEditorScreen extends Screen {
 	public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent event) {
 		if (dragging && event.button() == 0) {
 			dragging = false;
+			setDragging(false);
 			FlexhudConfig.save();
 			return true;
 		}
 		return super.mouseReleased(event);
+	}
+
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double horizontal, double vertical) {
+		if (!fullscreen) {
+			computePreview();
+			int mgmtH = 6 * 22;
+			int gb = prevY - 4 - mgmtH - 4;
+			int gt = contentTop() + 12;
+			if (mouseX >= panelX() && mouseX <= panelX() + panelW() && mouseY >= gt && mouseY <= gb) {
+				WidgetType[] all = WidgetType.values();
+				int rows = (all.length + 1) / 2;
+				int max = Math.max(0, rows * 20 - (gb - gt));
+				if (max > 0) {
+					double d = vertical != 0 ? vertical : horizontal;
+					int next = (int) Math.max(0, Math.min(max, addScroll - d * 14));
+					if (next != addScroll) {
+						addScroll = next;
+						rebuildWidgets();
+						return true;
+					}
+				}
+			}
+		}
+		return super.mouseScrolled(mouseX, mouseY, horizontal, vertical);
 	}
 
 	private boolean inside(double mx, double my) {
@@ -307,11 +381,11 @@ public class WidgetEditorScreen extends Screen {
 	}
 
 	private int widgetPx(WidgetConfig w) {
-		return prevX + Math.round(w.x * prevW);
+		return fullscreen ? Math.round(w.x * this.width) : prevX + Math.round(w.x * prevW);
 	}
 
 	private int widgetPy(WidgetConfig w) {
-		return prevY + 16 + Math.round(w.y * (prevH - 30));
+		return fullscreen ? Math.round(w.y * this.height) : prevY + 16 + Math.round(w.y * (prevH - 30));
 	}
 
 	private WidgetConfig nearestWidget(double mx, double my) {
@@ -356,8 +430,15 @@ public class WidgetEditorScreen extends Screen {
 	}
 
 	private void moveTo(WidgetConfig w, double mx, double my) {
-		float nx = (float) ((mx - prevX) / (double) prevW);
-		float ny = (float) ((my - (prevY + 16)) / (double) (prevH - 30));
+		float nx;
+		float ny;
+		if (fullscreen) {
+			nx = (float) (mx / (double) this.width);
+			ny = (float) (my / (double) this.height);
+		} else {
+			nx = (float) ((mx - prevX) / (double) prevW);
+			ny = (float) ((my - (prevY + 16)) / (double) (prevH - 30));
+		}
 		w.x = Math.max(0f, Math.min(1f, nx));
 		w.y = Math.max(0f, Math.min(1f, ny));
 	}
@@ -371,10 +452,10 @@ public class WidgetEditorScreen extends Screen {
 		return FlexhudConfig.get().byId(selectedId);
 	}
 
-	private void add(WidgetType type, String template) {
+	void createAndSelect(WidgetType type) {
 		FlexhudConfig cfg = FlexhudConfig.get();
 		String id = cfg.freeId(type);
-		WidgetConfig w = new WidgetConfig(id, type, template, 0.5f, 0.7f);
+		WidgetConfig w = new WidgetConfig(id, type, type.defaultTemplate(), 0.5f, 0.7f);
 		cfg.widgets.add(w);
 		selectedId = id;
 		pendingDelete = null;

@@ -20,8 +20,8 @@ param(
   [Parameter(Mandatory = $true)][string]$Author,
   [string]$Version = "1.0.0",
   [Parameter(Mandatory = $true)][string]$DownloadUrl,
-  [Parameter(Mandatory = $true)][string]$ModId,
-  [Parameter(Mandatory = $true)][string]$JarHints,
+  [string]$ModId = "",
+  [string]$JarHints = "",
   [ValidateSet("widget-pack", "bridge", "theme")][string]$PackType = "widget-pack",
   [string]$IconUrl = "",
   [string]$InstallNote = "",
@@ -40,7 +40,11 @@ if ($DownloadUrl -notmatch '^https?://') {
   throw "DownloadUrl muss mit http(s):// beginnen: $DownloadUrl"
 }
 $hints = @($JarHints -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" })
-if ($hints.Count -eq 0) { throw "JarHints darf nicht leer sein (z.B. 'meine-mod,meine_mod')." }
+if ([string]::IsNullOrWhiteSpace($ModId) -or $hints.Count -eq 0) {
+  Write-Host "HINWEIS: ohne ModId/JarHints keine Konflikterkennung (ok fuer reine Widget-Packs)." -ForegroundColor Yellow
+  $ModId = ""
+  $hints = @()
+}
 
 if (-not (Test-Path -LiteralPath $MarketplaceJson)) { throw "marketplace.json fehlt: $MarketplaceJson" }
 $data = Get-Content -LiteralPath $MarketplaceJson -Raw -Encoding UTF8 | ConvertFrom-Json

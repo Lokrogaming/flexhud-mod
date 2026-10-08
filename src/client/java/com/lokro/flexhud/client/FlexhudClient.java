@@ -4,6 +4,7 @@ import com.lokro.flexhud.FlexhudMod;
 import com.lokro.flexhud.client.cmd.FlexhudCommands;
 import com.lokro.flexhud.client.config.FlexhudConfig;
 import com.lokro.flexhud.client.hud.WidgetHud;
+import com.lokro.flexhud.client.hud.WidgetValues;
 import com.lokro.flexhud.client.key.FlexhudKeys;
 import com.lokro.flexhud.client.market.MarketplaceCache;
 import com.lokro.flexhud.client.market.UpdateChecker;
@@ -25,12 +26,13 @@ public class FlexhudClient implements ClientModInitializer {
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			TimerState.tick();
+			WidgetValues.tick(client);
 			FlexhudKeys.tick(client);
 		});
 
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-		MarketplaceCache.refreshAsyncIfStale();
-		UpdateChecker.refreshAsync(null);
+			MarketplaceCache.refreshAsyncIfStale();
+			WidgetValues.onWorldChange();
 			UpdateChecker.notifyOnJoin();
 		});
 

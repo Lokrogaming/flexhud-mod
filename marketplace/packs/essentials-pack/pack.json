@@ -1,0 +1,88 @@
+{
+  "_comment": "Essentials-Pack: Uhr, FPS, Koordinaten, Tag. Reines Widget-Pack (keine fremde Mod nötig).",
+  "packId": "essentials-pack",
+  "packName": "Essentials-Pack",
+  "packVersion": "1.0.0",
+  "widgets": [
+    {
+      "id": "clock-imported",
+      "type": "CLOCK",
+      "template": "{value}",
+      "x": 0.02,
+      "y": 0.02,
+      "enabled": true,
+      "style": {
+        "gradient": ["00FFCC", "33AAFF", "AA55FF", "FF55AA", "FFAA33", "FFFF66"],
+        "animation": "SCROLL_L",
+        "cycleMs": 3500,
+        "bold": true,
+        "italic": false,
+        "shadow": true,
+        "background": false,
+        "backgroundOpacity": 120,
+        "scale": 1.0,
+        "staticColor": "FFFFFF"
+      }
+    },
+    {
+      "id": "fps-imported",
+      "type": "FPS",
+      "template": "FPS: {value}",
+      "x": 0.02,
+      "y": 0.06,
+      "enabled": true,
+      "style": {
+        "gradient": ["00FFCC", "33AAFF", "AA55FF", "FF55AA", "FFAA33", "FFFF66"],
+        "animation": "SCROLL_L",
+        "cycleMs": 3500,
+        "bold": true,
+        "italic": false,
+        "shadow": true,
+        "background": false,
+        "backgroundOpacity": 120,
+        "scale": 1.0,
+        "staticColor": "FFFFFF"
+      }
+    },
+    {
+      "id": "coords-imported",
+      "type": "COORDS",
+      "template": "XYZ: {value}",
+      "x": 0.02,
+      "y": 0.10,
+      "enabled": true,
+      "style": {
+        "gradient": ["00FFCC", "33AAFF", "AA55FF", "FF55AA", "FFAA33", "FFFF66"],
+        "animation": "SCROLL_L",
+        "cycleMs": 3500,
+        "bold": true,
+        "italic": false,
+        "shadow": true,
+        "background": false,
+        "backgroundOpacity": 120,
+        "scale": 1.0,
+        "staticColor": "FFFFFF"
+      }
+    },
+    {
+      "id": "day-imported",
+      "type": "DAY",
+      "template": "Tag: {value}",
+      "x": 0.02,
+      "y": 0.14,
+      "enabled": true,
+      "style": {
+        "gradient": ["00FFCC", "33AAFF", "AA55FF", "FF55AA", "FFAA33", "FFFF66"],
+        "animation": "SCROLL_L",
+        "cycleMs": 3500,
+        "bold": true,
+        "italic": false,
+        "shadow": true,
+        "background": false,
+        "backgroundOpacity": 120,
+        "scale": 1.0,
+        "staticColor": "FFFFFF"
+      }
+    }
+  ]
+}

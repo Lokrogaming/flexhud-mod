@@ -1,0 +1,128 @@
+{
+  "_comment": "PvP-Pack: CPS, Reach, Ping, Rüstung, Tasten, Effekte. Reines Widget-Pack (keine fremde Mod nötig).",
+  "packId": "pvp-pack",
+  "packName": "PvP-Pack",
+  "packVersion": "1.0.0",
+  "widgets": [
+    {
+      "id": "cps-imported",
+      "type": "CPS",
+      "template": "CPS: {value}",
+      "x": 0.02,
+      "y": 0.30,
+      "enabled": true,
+      "style": {
+        "gradient": ["FF55AA", "FF7744", "FFAA33", "FFFF66"],
+        "animation": "SCROLL_L",
+        "cycleMs": 2500,
+        "bold": true,
+        "italic": false,
+        "shadow": true,
+        "background": false,
+        "backgroundOpacity": 120,
+        "scale": 1.0,
+        "staticColor": "FFFFFF"
+      }
+    },
+    {
+      "id": "reach-imported",
+      "type": "REACH",
+      "template": "Reach: {value}",
+      "x": 0.02,
+      "y": 0.34,
+      "enabled": true,
+      "style": {
+        "gradient": ["FF55AA", "FF7744", "FFAA33", "FFFF66"],
+        "animation": "SCROLL_L",
+        "cycleMs": 2500,
+        "bold": true,
+        "italic": false,
+        "shadow": true,
+        "background": false,
+        "backgroundOpacity": 120,
+        "scale": 1.0,
+        "staticColor": "FFFFFF"
+      }
+    },
+    {
+      "id": "ping-imported",
+      "type": "PING",
+      "template": "Ping: {value}ms",
+      "x": 0.02,
+      "y": 0.38,
+      "enabled": true,
+      "style": {
+        "gradient": ["FF55AA", "FF7744", "FFAA33", "FFFF66"],
+        "animation": "SCROLL_L",
+        "cycleMs": 2500,
+        "bold": true,
+        "italic": false,
+        "shadow": true,
+        "background": false,
+        "backgroundOpacity": 120,
+        "scale": 1.0,
+        "staticColor": "FFFFFF"
+      }
+    },
+    {
+      "id": "armor-imported",
+      "type": "ARMOR",
+      "template": "Armor: {value}",
+      "x": 0.02,
+      "y": 0.42,
+      "enabled": true,
+      "style": {
+        "gradient": ["FF55AA", "FF7744", "FFAA33", "FFFF66"],
+        "animation": "SCROLL_L",
+        "cycleMs": 2500,
+        "bold": true,
+        "italic": false,
+        "shadow": true,
+        "background": false,
+        "backgroundOpacity": 120,
+        "scale": 1.0,
+        "staticColor": "FFFFFF"
+      }
+    },
+    {
+      "id": "keys-imported",
+      "type": "KEYS",
+      "template": "{value}",
+      "x": 0.50,
+      "y": 0.88,
+      "enabled": true,
+      "style": {
+        "gradient": ["FF55AA", "FF7744", "FFAA33", "FFFF66"],
+        "animation": "OFF",
+        "cycleMs": 2500,
+        "bold": true,
+        "italic": false,
+        "shadow": true,
+        "background": true,
+        "backgroundOpacity": 120,
+        "scale": 1.0,
+        "staticColor": "FFFFFF"
+      }
+    },
+    {
+      "id": "potions-imported",
+      "type": "POTIONS",
+      "template": "Effekte: {value}",
+      "x": 0.98,
+      "y": 0.02,
+      "enabled": true,
+      "style": {
+        "gradient": ["FF55AA", "FF7744", "FFAA33", "FFFF66"],
+        "animation": "SCROLL_L",
+        "cycleMs": 2500,
+        "bold": true,
+        "italic": false,
+        "shadow": true,
+        "background": false,
+        "backgroundOpacity": 120,
+        "scale": 1.0,
+        "staticColor": "FFFFFF"
+      }
+    }
+  ]
+}

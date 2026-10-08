@@ -45,11 +45,18 @@ if ($data -ne $null) {
     $ids = @{}
     foreach ($p in $packs) {
       $label = if ($p.id) { $p.id } else { "(ohne id)" }
-      foreach ($f in @("id", "name", "downloadUrl", "modId", "jarHints")) {
+      foreach ($f in @("id", "name", "downloadUrl")) {
         $v = $p.$f
         $empty = ($null -eq $v) -or ($v -is [string] -and $v.Trim() -eq "") -or ($v -is [array] -and $v.Count -eq 0)
         if ($empty) { Fail "[$label] Pflichtfeld fehlt/leer: $f" }
       }
+      $noConflict = $true
+      foreach ($f in @("modId", "jarHints")) {
+        $v = $p.$f
+        $empty = ($null -eq $v) -or ($v -is [string] -and $v.Trim() -eq "") -or ($v -is [array] -and $v.Count -eq 0)
+        if ($empty) { $noConflict = $false }
+      }
+      if ($noConflict -eq $false) { Warn "[$label] ohne modId/jarHints: keine Konflikterkennung (ok fuer reine Widget-Packs)" }
       if ($p.id -and $p.id -notmatch '^[a-z0-9][a-z0-9._-]*$') {
         Fail "[$label] id-Format ungültig (nur a-z 0-9 . _ -, Kleinbuchstaben): $($p.id)"
       }
