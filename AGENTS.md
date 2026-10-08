@@ -76,6 +76,9 @@ Zip-Layout: `pack.json` (mit `widgets[]`) im Zip-Root + optionale README/Assets.
   ID-Format, Duplikate; `-CheckUrl -VerifyZip` prüfen Link + pack.json im Root).
 - Danach `scripts/Test-MarketplaceJson.ps1` (ggf. `-CheckUrls -VerifyZips`).
 - Feld-Vorlage: `marketplace/template-pack-entry.json`.
+- Deinstallieren: `PackInstaller.uninstall` (Dateien + importierte Widgets);
+  Herkunft in `marketplace/installed.json` (`InstalledRegistry`), UI mit
+  Zwei-Klick-Bestätigung im `MarketplaceScreen`.
 
 ## Dokumentation
 - `README.md` = User-Doku + CurseForge/Modrinth-Description (zusammen halten!).

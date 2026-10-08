@@ -33,7 +33,9 @@ import java.util.zip.ZipFile;
  * {@code flexhud/marketplace/packs/<id>/}.
  *
  * <p>Enthält die Zip eine {@code pack.json} mit {@code widgets[]}, werden diese
- * als neue Widgets in die Config übernommen (mit frischen IDs).
+ * als neue Widgets in die Config übernommen (mit frischen IDs). Die Herkunft
+ * wird in {@link InstalledRegistry} festgehalten, damit Deinstallieren die
+ * Pack-Dateien UND die importierten Widgets wieder entfernen kann.
  */
 public final class PackInstaller {
 	private PackInstaller() {}
@@ -65,6 +67,89 @@ public final class PackInstaller {
 		});
 	}
 
+	public static void uninstallAsync(MarketplaceEntry entry, Consumer<String> done) {
+		CompletableFuture.runAsync(() -> {
+			try {
+				done.accept(uninstall(entry));
+			} catch (Exception e) {
+				FlexhudMod.LOGGER.warn("[FlexHUD] Deinstallation von '{}' fehlgeschlagen.", entry.id, e);
+				done.accept("FEHLER: " + e.getClass().getSimpleName() + ": " + String.valueOf(e.getMessage()));
+			}
+		});
+	}
+
+	/** Zählt noch vorhandene Widgets, die aus diesem Pack importiert wurden. */
+	public static int importedWidgetCount(MarketplaceEntry entry) {
+		InstalledRegistry.Entry rec = InstalledRegistry.get(entry.id);
+		if (rec == null || rec.widgetIds == null) {
+			return 0;
+		}
+		int n = 0;
+		for (String wid : rec.widgetIds) {
+			if (FlexhudConfig.get().byId(wid) != null) {
+				n++;
+			}
+		}
+		return n;
+	}
+
+	/**
+	 * Deinstalliert ein Pack: löscht entpackte Dateien + heruntergeladene Zip(s)
+	 * sowie alle noch vorhandenen Widgets, die aus dem Pack importiert wurden.
+	 */
+	static String uninstall(MarketplaceEntry entry) throws Exception {
+		List<String> removedFiles = new ArrayList<>();
+
+		Path packDir = MarketplaceCache.packsDir().resolve(safeId(entry.id));
+		if (Files.isDirectory(packDir)) {
+			deleteRecursive(packDir);
+			removedFiles.add("packs/" + safeId(entry.id) + "/");
+		}
+		Path dl = MarketplaceCache.downloadedDir();
+		if (Files.isDirectory(dl)) {
+			String prefix = safeId(entry.id) + "-";
+			try (var ds = Files.newDirectoryStream(dl, prefix + "*.zip")) {
+				for (Path zip : ds) {
+					Files.deleteIfExists(zip);
+					removedFiles.add("downloaded/" + zip.getFileName());
+				}
+			}
+		}
+
+		InstalledRegistry.Entry rec = InstalledRegistry.get(entry.id);
+		int removedWidgets = 0;
+		if (rec != null && rec.widgetIds != null) {
+			for (String wid : rec.widgetIds) {
+				WidgetConfig w = FlexhudConfig.get().byId(wid);
+				if (w != null) {
+					FlexhudConfig.get().widgets.remove(w);
+					removedWidgets++;
+				}
+			}
+			if (removedWidgets > 0) {
+				FlexhudConfig.save();
+			}
+		}
+		InstalledRegistry.remove(entry.id);
+
+		boolean hadRecord = rec != null;
+		String msg = "Deinstalliert: " + entry.name
+			+ " (" + (removedFiles.isEmpty() ? "keine Dateien mehr da" : String.join(", ", removedFiles))
+			+ (removedWidgets > 0 ? ", " + removedWidgets + " Widget(s) entfernt" : "")
+			+ (hadRecord ? "" : ", Hinweis: keine Widget-Zuordnung gespeichert (alter Install)")
+			+ ").";
+		FlexhudMod.LOGGER.info("[FlexHUD] {}", msg);
+		return msg;
+	}
+
+	private static void deleteRecursive(Path dir) throws Exception {
+		try (var walk = Files.walk(dir)) {
+			for (Path p : walk.sorted(java.util.Comparator.reverseOrder()).toList()) {
+				Files.deleteIfExists(p);
+			}
+		}
+	}
+
 	static String install(MarketplaceEntry entry) throws Exception {
 		Files.createDirectories(MarketplaceCache.downloadedDir());
 		Files.createDirectories(MarketplaceCache.packsDir());
@@ -90,13 +175,14 @@ public final class PackInstaller {
 		Path target = MarketplaceCache.packsDir().resolve(safeId(entry.id));
 		unzip(zip, target);
 
-		int imported = importWidgets(target);
+		List<String> importedIds = importWidgets(target);
+		InstalledRegistry.recordInstall(entry.id, entry.version, importedIds);
 
 		ConflictChecker.Conflict c = ConflictChecker.check(entry);
 		String warn = ConflictChecker.warnText(entry, c);
 
 		String ok = "Installiert: " + entry.name + " v" + entry.version
-			+ " (" + zip.getFileName() + (imported > 0 ? ", " + imported + " Widget(s) übernommen" : "") + ").";
+			+ " (" + zip.getFileName() + (!importedIds.isEmpty() ? ", " + importedIds.size() + " Widget(s) übernommen" : "") + ").";
 		if (warn != null) {
 			ok += "\n" + warn;
 		}
@@ -127,17 +213,18 @@ public final class PackInstaller {
 		}
 	}
 
-	/** Liest packs/<id>/pack.json und übernimmt enthaltene Widgets. */
-	static int importWidgets(Path packDir) {
+	/** Liest packs/<id>/pack.json, übernimmt Widgets und gibt deren neue IDs zurück. */
+	static List<String> importWidgets(Path packDir) {
+		List<String> ids = new ArrayList<>();
 		Path packJson = packDir.resolve("pack.json");
 		if (!Files.isRegularFile(packJson)) {
-			return 0;
+			return ids;
 		}
 		try {
 			String json = Files.readString(packJson);
 			JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 			if (!obj.has("widgets") || !obj.get("widgets").isJsonArray()) {
-				return 0;
+				return ids;
 			}
 			JsonArray arr = obj.getAsJsonArray("widgets");
 			List<WidgetConfig> fresh = new ArrayList<>();
@@ -150,6 +237,7 @@ public final class PackInstaller {
 							FlexhudConfig.get().widgets.add(w);
 						}
 						fresh.add(w);
+						ids.add(w.id);
 					}
 				} catch (Exception ex) {
 					FlexhudMod.LOGGER.warn("[FlexHUD] Widget aus pack.json übersprungen.", ex);
@@ -158,10 +246,10 @@ public final class PackInstaller {
 			if (!fresh.isEmpty()) {
 				FlexhudConfig.save();
 			}
-			return fresh.size();
+			return ids;
 		} catch (Exception e) {
 			FlexhudMod.LOGGER.warn("[FlexHUD] pack.json konnte nicht gelesen werden.", e);
-			return 0;
+			return ids;
 		}
 	}
 

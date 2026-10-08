@@ -81,6 +81,10 @@ Die Mod läuft **komplett client-seitig** – auch auf Servern ohne Server-Mod.
   automatisch in deine Config übernommen (IDs werden neu vergeben).
 - Bei erkannten Überschneidungen (Mod schon als `.jar` da) zeigt FlexHUD eine
   **Warnung** – z. B. StepCount-HUD vs. FlexHUD-Widget.
+- **Deinstallieren**: Installierte Packs haben im Marketplace einen
+  **Deinstallieren**-Button (2x klicken zur Bestätigung). Entfernt Pack-Dateien,
+  heruntergeladene Zip **und** die daraus importierten Widgets.
+  Die Herkunft steht in `.minecraft/flexhud/marketplace/installed.json`.
 
 ## Eigene Marketplace-Packs (für Pack-Autoren)
 
