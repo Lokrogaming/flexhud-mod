@@ -1,0 +1,18 @@
+{
+  "_comment": "FlexHUD-Marketplace. Diese Datei wird von der Mod per URL geladen (siehe Config marketplaceUrl). PFLICHT-Felder pro Pack: id, name, downloadUrl, modId, jarHints.",
+  "packs": [
+    {
+      "id": "stepcount-bridge-pack",
+      "name": "StepCount-Bridge-Pack (Example)",
+      "description": "Offizielles Beispiel-Pack: bindet die StepCount-Mod an FlexHUD ein (frei positionierbares Steps-Widget + Sunset-Gradient).",
+      "author": "Lokro",
+      "version": "1.0.0",
+      "iconUrl": "",
+      "downloadUrl": "https://github.com/lokro/stepcount-mod/releases/download/flexhud-pack-v1.0.0/stepcount-bridge-pack-1.0.0.zip",
+      "modId": "stepcount",
+      "jarHints": ["stepcount-mod", "stepcount"],
+      "packType": "bridge",
+      "installNote": "Benötigt die StepCount-Mod als .jar in mods/. Nach Install: StepCount-HUD mit /stepcount show AUSBLENDEN und FlexHUD-Widget nutzen."
+    }
+  ]
+}

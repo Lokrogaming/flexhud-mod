@@ -1,0 +1,30 @@
+{
+  "_comment": "Example-Pack: wird als .zip über den Marketplace verteilt und von FlexHUD nach flexhud/marketplace/packs/stepcount-bridge-pack/ entpackt. widgets[] wird beim Installieren in die Config übernommen (IDs werden neu vergeben).",
+  "packId": "stepcount-bridge-pack",
+  "packName": "StepCount-Bridge-Pack",
+  "packVersion": "1.0.0",
+  "requiresModId": "stepcount",
+  "requiresJarHints": ["stepcount-mod", "stepcount"],
+  "widgets": [
+    {
+      "id": "steps-imported",
+      "type": "STEPCOUNT",
+      "template": "Steps: {value}",
+      "x": 0.5,
+      "y": 0.65,
+      "enabled": true,
+      "style": {
+        "gradient": ["FF55AA", "FF7744", "FFAA33", "FFFF66"],
+        "animation": "SCROLL_L",
+        "cycleMs": 3500,
+        "bold": true,
+        "italic": false,
+        "shadow": true,
+        "background": false,
+        "backgroundOpacity": 120,
+        "scale": 1.0,
+        "staticColor": "FFFFFF"
+      }
+    }
+  ]
+}

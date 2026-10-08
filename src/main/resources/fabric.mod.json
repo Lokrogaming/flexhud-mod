@@ -1,0 +1,44 @@
+{
+	"schemaVersion": 1,
+	"id": "flexhud",
+	"version": "${version}",
+	"name": "FlexHUD",
+	"description": "Frei positionierbare HUD-Widgets (Timer, StepCount-Bridge u.v.m.) mit Gradient/Animation-Styles, Widget-Editor und eingebautem Marketplace.",
+	"authors": [
+		"Lokro"
+	],
+	"contact": {
+		"homepage": "https://github.com/lokro/flexhud-mod",
+		"sources": "https://github.com/lokro/flexhud-mod",
+		"issues": "https://github.com/lokro/flexhud-mod/issues"
+	},
+	"license": "MIT",
+	"icon": "assets/flexhud/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"com.lokro.flexhud.FlexhudMod"
+		],
+		"client": [
+			"com.lokro.flexhud.client.FlexhudClient"
+		],
+		"modmenu": [
+			"com.lokro.flexhud.compat.FlexhudModMenu"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	},
+	"breaks": {},
+	"custom": {
+		"modmenu": {
+			"parent": {
+				"id": "flexhud",
+				"name": "FlexHUD"
+			}
+		}
+	}
+}

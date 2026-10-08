@@ -1,0 +1,10 @@
+.gradle/
+build/
+dist/
+out/
+*.class
+run/
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
