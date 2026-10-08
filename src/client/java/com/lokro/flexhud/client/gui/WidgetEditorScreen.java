@@ -28,6 +28,7 @@ public class WidgetEditorScreen extends Screen {
 	private String selectedId = null;
 	private boolean dragging = false;
 	private int listPage = 0;
+	private String pendingDelete = null;
 
 	// Vorschau-Rechteck (wird in init()/extractRenderState identisch berechnet)
 	private int prevX, prevY, prevW, prevH;
@@ -99,6 +100,7 @@ public class WidgetEditorScreen extends Screen {
 			addRenderableWidget(Button.builder(Component.literal(label),
 				b -> {
 					selectedId = wid;
+					pendingDelete = null;
 					rebuildWidgets();
 				}).bounds(10, y, lw, 20).build());
 			y += 22;
@@ -157,6 +159,39 @@ public class WidgetEditorScreen extends Screen {
 
 		addRenderableWidget(Button.builder(Component.literal("Zurück"),
 			b -> onClose()).bounds(10, this.height - footerH() + 2, 100, 20).build());
+
+		// Aktions-Leiste für die Auswahl: erscheint sobald ein Widget gewählt ist.
+		// Fix in der Footer-Zeile platziert -> immer sichtbar (auch auf kleinen Fenstern).
+		WidgetConfig sel = selected();
+		if (sel != null) {
+			int ax = 120;
+			int abw = Math.max(50, (this.width - ax - 10 - 2 * 4) / 3);
+			int ay = this.height - footerH() + 2;
+			String toggleLabel = sel.enabled ? "Ausschalten" : "Einschalten";
+			addRenderableWidget(Button.builder(Component.literal(toggleLabel),
+				b -> toggleSelected()).bounds(ax, ay, abw, 20).build());
+			addRenderableWidget(Button.builder(Component.literal("Stil…"),
+				b -> {
+					if (selectedId != null) {
+						switchTo(new StyleEditScreen(this, selectedId));
+					}
+				}).bounds(ax + abw + 4, ay, abw, 20).build());
+			boolean confirm = sel.id.equals(pendingDelete);
+			addRenderableWidget(Button.builder(Component.literal(confirm ? "Sicher löschen?" : "Löschen"),
+				b -> {
+					WidgetConfig s = selected();
+					if (s == null) {
+						return;
+					}
+					if (s.id.equals(pendingDelete)) {
+						pendingDelete = null;
+						deleteSelected();
+					} else {
+						pendingDelete = s.id;
+						rebuildWidgets();
+					}
+				}).bounds(ax + (abw + 4) * 2, ay, abw, 20).build());
+		}
 	}
 
 	private int addFull(int x, int y, int w, String label, Runnable action) {
@@ -243,6 +278,9 @@ public class WidgetEditorScreen extends Screen {
 		if (event.button() == 0 && inside(event.x(), event.y())) {
 			WidgetConfig nearest = nearestWidget(event.x(), event.y());
 			if (nearest != null) {
+				if (!nearest.id.equals(selectedId)) {
+					pendingDelete = null;
+				}
 				selectedId = nearest.id;
 				dragging = true;
 				moveTo(nearest, event.x(), event.y());
@@ -351,6 +389,7 @@ public class WidgetEditorScreen extends Screen {
 		WidgetConfig w = new WidgetConfig(id, type, template, 0.5f, 0.7f);
 		cfg.widgets.add(w);
 		selectedId = id;
+		pendingDelete = null;
 		FlexhudConfig.save();
 		rebuildWidgets();
 	}
@@ -362,6 +401,7 @@ public class WidgetEditorScreen extends Screen {
 		}
 		FlexhudConfig.get().widgets.remove(w);
 		selectedId = FlexhudConfig.get().widgets.isEmpty() ? null : FlexhudConfig.get().widgets.get(0).id;
+		pendingDelete = null;
 		FlexhudConfig.save();
 		rebuildWidgets();
 	}
