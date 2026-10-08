@@ -56,32 +56,40 @@ public final class WidgetHud {
 
 	/** Vorschau-Text für den Editor (ohne Spielwelt nutzbar). */
 	public static String previewText(WidgetConfig w) {
+		if (w.type == WidgetType.TEXT) {
+			return w.style.hideText ? "" : w.template;
+		}
+		String tpl = w.style.hideText ? "{value}" : w.template;
 		return switch (w.type) {
-			case TIMER -> applyTemplate(w.template, TimerState.format(754000L, true));
-			case STEPCOUNT -> applyTemplate(w.template, "1234");
-			case CLOCK -> applyTemplate(w.template, "21:37:00");
-			case TEXT -> applyTemplate(w.template, "FlexHUD");
-			case FPS -> applyTemplate(w.template, "120");
+			case TIMER -> applyTemplate(tpl, TimerState.format(754000L, true));
+			case STEPCOUNT -> applyTemplate(tpl, "1234");
+			case CLOCK -> applyTemplate(tpl, "21:37:00");
+			case TEXT -> tpl;
+			case FPS -> applyTemplate(tpl, "120");
 		};
 	}
 
 	static String textFor(WidgetConfig w, Minecraft client) {
+		if (w.type == WidgetType.TEXT) {
+			return w.style.hideText ? "" : w.template;
+		}
+		String tpl = w.style.hideText ? "{value}" : w.template;
 		return switch (w.type) {
 			case TIMER -> {
 				if (!TimerState.shouldShowHud()) {
 					yield null;
 				}
-				yield applyTemplate(w.template, TimerState.format(TimerState.getElapsedMs(), true));
+				yield applyTemplate(tpl, TimerState.format(TimerState.getElapsedMs(), true));
 			}
 			case STEPCOUNT -> {
 				if (!StepcountBridge.installed()) {
-					yield applyTemplate(w.template, "n/a (StepCount fehlt)");
+					yield applyTemplate(tpl, "n/a (StepCount fehlt)");
 				}
-				yield applyTemplate(w.template, String.valueOf(StepcountBridge.getSteps()));
+				yield applyTemplate(tpl, String.valueOf(StepcountBridge.getSteps()));
 			}
-			case CLOCK -> applyTemplate(w.template, LocalTime.now().format(CLOCK));
-			case TEXT -> applyTemplate(w.template, "FlexHUD");
-			case FPS -> applyTemplate(w.template, String.valueOf(client.getFps()));
+			case CLOCK -> applyTemplate(tpl, LocalTime.now().format(CLOCK));
+			case TEXT -> tpl;
+			case FPS -> applyTemplate(tpl, String.valueOf(client.getFps()));
 		};
 	}
 

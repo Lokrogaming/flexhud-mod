@@ -23,6 +23,8 @@ Die Mod läuft **komplett client-seitig** – auch auf Servern ohne Server-Mod.
 - 🎨 **Style pro Widget**: Gradient-Presets (u. a. StepCount-Classic, Ocean, Sunset,
   Candy, Gold), Animationen (Scroll links/rechts, Puls, Regenbogen, statisch),
   Dauer, Fett/Kursiv, Schatten, Hintergrund, Skalierung, `{value}`-Vorlagen.
+  Jedes Element einzeln schaltbar: **Text** (nur Wert anzeigen), Schatten,
+  Hintergrund – z. B. Timer ohne „Timer:"-Label, nur die Zeit.
 - 🌉 **StepCount-Bridge**: steuert die StepCount-Mod (`start/stop/reset/show`)
   und zeigt die Steps als **frei positionierbares** FlexHUD-Widget – während
   StepCounts eigenes HUD fix über der Hotbar bleibt. Inklusive

@@ -82,6 +82,9 @@ public class StyleEditScreen extends Screen {
 		addRenderableWidget(Button.builder(Component.literal("Hintergrund: " + anAus(w.style.background)),
 			b -> toggle(b, "Hintergrund")).bounds(cx + 2, y, 148, 20).build());
 		y += 24;
+		addRenderableWidget(Button.builder(Component.literal("Text: " + anAus(!w.style.hideText)),
+			b -> toggle(b, "Text")).bounds(cx - 150, y, 300, 20).build());
+		y += 24;
 		addRenderableWidget(Button.builder(Component.literal("Preset: " + presetName()),
 			b -> {
 				applyNextPreset();
@@ -116,12 +119,14 @@ public class StyleEditScreen extends Screen {
 			case "Kursiv" -> w.style.italic = !w.style.italic;
 			case "Schatten" -> w.style.shadow = !w.style.shadow;
 			case "Hintergrund" -> w.style.background = !w.style.background;
+			case "Text" -> w.style.hideText = !w.style.hideText;
 		}
 		b.setMessage(Component.literal(what + ": " + anAus(
 			switch (what) {
 				case "Fett" -> w.style.bold;
 				case "Kursiv" -> w.style.italic;
 				case "Schatten" -> w.style.shadow;
+				case "Text" -> !w.style.hideText;
 				default -> w.style.background;
 			})));
 		FlexhudConfig.save();

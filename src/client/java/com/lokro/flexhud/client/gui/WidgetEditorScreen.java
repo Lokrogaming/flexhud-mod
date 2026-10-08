@@ -196,7 +196,8 @@ public class WidgetEditorScreen extends Screen {
 				infoX, iy + 24, 0xCCCCCC);
 			graphics.text(this.font, "Stil: " + sel.style.animation.displayName()
 				+ " · " + sel.style.cycleMs + "ms"
-				+ (sel.style.bold ? " · fett" : ""), infoX, iy + 36, 0xCCCCCC);
+				+ (sel.style.bold ? " · fett" : "")
+				+ (sel.style.hideText ? " · ohne Text" : ""), infoX, iy + 36, 0xCCCCCC);
 			String tpl = sel.template.length() > 30 ? sel.template.substring(0, 30) + "…" : sel.template;
 			graphics.text(this.font, "Vorlage: " + tpl, infoX, iy + 48, 0x888888);
 		}

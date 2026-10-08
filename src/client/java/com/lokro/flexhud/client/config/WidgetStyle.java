@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/** Kosmetik pro Widget: Gradient, Animation, Fett/Kursiv, Schatten, Hintergrund, Skalierung. */
+/** Kosmetik pro Widget: Gradient, Animation, Fett/Kursiv, Schatten, Hintergrund, Skalierung, Text an/aus. */
 public class WidgetStyle {
 	/** Hex-Farben ohne '#', z.B. ["00FFCC","33AAFF","AA55FF","FF55AA","FFAA33","FFFF66"]. */
 	public List<String> gradient = new ArrayList<>(Arrays.asList(
@@ -16,6 +16,8 @@ public class WidgetStyle {
 	public boolean italic = false;
 	public boolean shadow = true;
 	public boolean background = false;
+	/** Text/Label ausblenden (nur Wert anzeigen). Vorlage bleibt gespeichert. */
+	public boolean hideText = false;
 	public int backgroundOpacity = 120;
 	public float scale = 1.0f;
 	/** Statische Farbe (wenn animation == OFF), Hex ohne '#'. */
@@ -30,6 +32,7 @@ public class WidgetStyle {
 		s.italic = italic;
 		s.shadow = shadow;
 		s.background = background;
+		s.hideText = hideText;
 		s.backgroundOpacity = backgroundOpacity;
 		s.scale = scale;
 		s.staticColor = staticColor;
